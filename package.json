@@ -8,7 +8,12 @@
     "ingest": "node scripts/ingest_postgres.js",
     "dev": "concurrently \"npm:server\" \"npm:client\"",
     "server": "nodemon server/index.js",
-    "client": "cd client && npm run dev"
+    "client": "cd client && npm run dev",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "vitest run --project e2e",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -34,6 +39,8 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2",
+    "vitest": "^4.0.18"
   }
 }
