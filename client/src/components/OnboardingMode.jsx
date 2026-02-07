@@ -8,6 +8,9 @@ export default function OnboardingMode({ userId, onExit }) {
   const [loading, setLoading] = useState(false);
   const [currentExplanation, setCurrentExplanation] = useState(null);
   const [showCheckpoint, setShowCheckpoint] = useState(false);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [quizResult, setQuizResult] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // Load available modules on mount
   useEffect(() => {
@@ -59,11 +62,38 @@ export default function OnboardingMode({ userId, onExit }) {
       const data = await res.json();
       setCurrentExplanation(data);
       setShowCheckpoint(false);
+      setUserAnswer('');
+      setQuizResult(null);
 
     } catch (error) {
       console.error('Failed to load step:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Submit answer for quiz validation
+  const submitAnswer = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch('/onboarding/validate-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          module: selectedModule,
+          step_number: step.step_number,
+          user_answer: userAnswer
+        })
+      });
+
+      const result = await res.json();
+      setQuizResult(result);
+    } catch (error) {
+      console.error('Failed to submit answer:', error);
+      alert('Failed to check answer. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -196,19 +226,57 @@ export default function OnboardingMode({ userId, onExit }) {
               >
                 I understand this step
               </button>
+            ) : quizResult ? (
+              <div className={`quiz-feedback ${quizResult.is_correct ? 'correct' : 'incorrect'}`}>
+                <div className="feedback-icon">
+                  {quizResult.is_correct ? 'Correct!' : 'Not quite'}
+                </div>
+                <p className="feedback-text">{quizResult.feedback}</p>
+
+                {quizResult.can_proceed ? (
+                  <button
+                    onClick={completeStep}
+                    className="continue-btn"
+                    disabled={loading}
+                  >
+                    Continue to Next Step
+                  </button>
+                ) : (
+                  <>
+                    <p className="retry-hint">
+                      Attempts: {quizResult.attempts}/{quizResult.max_attempts}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setQuizResult(null);
+                        setUserAnswer('');
+                      }}
+                      className="retry-btn"
+                    >
+                      Try Again
+                    </button>
+                  </>
+                )}
+              </div>
             ) : (
               <div className="checkpoint">
                 <h3>Knowledge Check:</h3>
                 <p>{step?.checkpoint_question}</p>
-                <p className="checkpoint-help">
-                  Think about your answer, then click Continue when you're ready.
-                </p>
+
+                <textarea
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Type your answer here..."
+                  rows="4"
+                  className="answer-input"
+                />
+
                 <button
-                  onClick={completeStep}
-                  className="continue-btn"
-                  disabled={loading}
+                  onClick={submitAnswer}
+                  disabled={!userAnswer.trim() || submitting}
+                  className="submit-answer-btn"
                 >
-                  Continue to Next Step
+                  {submitting ? 'Checking...' : 'Submit Answer'}
                 </button>
               </div>
             )}

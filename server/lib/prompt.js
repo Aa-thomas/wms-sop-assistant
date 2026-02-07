@@ -87,4 +87,47 @@ OUTPUT FORMAT (JSON):
 NOW: Create the explanation for "${step.step_title}". Make it clear, encouraging, and actionable!`;
 }
 
-module.exports = { buildPrompt, buildOnboardingPrompt };
+function buildQuizValidationPrompt(question, userAnswer, chunks) {
+  const context = chunks.map(c => c.text).join('\n\n');
+
+  return `You are grading a new warehouse operator's answer to a training checkpoint question.
+
+QUESTION:
+${question}
+
+USER'S ANSWER:
+${userAnswer}
+
+REFERENCE MATERIAL (SOPs):
+${context}
+
+GRADING CRITERIA:
+- The answer doesn't need to be word-for-word perfect
+- Accept paraphrased answers if they demonstrate understanding
+- Key points must be present (safety-critical steps can't be skipped)
+- Minor errors in terminology are OK if concept is correct
+
+OUTPUT FORMAT (JSON):
+{
+  "is_correct": true/false,
+  "feedback": "Brief explanation. If correct: 'Great job! You got it.' If incorrect: 'Not quite. The key point you missed is...' Keep it encouraging."
+}
+
+EXAMPLES:
+
+Question: "What do you do if you encounter a short pick?"
+User Answer: "Mark it as short and let my supervisor know"
+Correct: YES (has key steps: mark short + notify supervisor)
+Feedback: "Great job! You've got the main steps correct."
+
+Question: "What are the main steps in batch picking?"
+User Answer: "Get items from shelves"
+Correct: NO (too vague, missing critical steps like scanning, confirming quantities)
+Feedback: "Not quite. You're on the right track, but batch picking involves several specific steps: selecting the batch, scanning items, confirming quantities, and closing the batch. Try reviewing the workflow again."
+
+IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanation.
+
+NOW: Grade the user's answer above.`;
+}
+
+module.exports = { buildPrompt, buildOnboardingPrompt, buildQuizValidationPrompt };

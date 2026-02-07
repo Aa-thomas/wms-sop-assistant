@@ -1,0 +1,223 @@
+import { useState, useEffect } from 'react';
+import './SupervisorDashboard.css';
+
+export default function SupervisorDashboard({ onExit }) {
+  const [dashboard, setDashboard] = useState([]);
+  const [summary, setSummary] = useState([]);
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboard();
+    loadSummary();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      const res = await fetch('/onboarding/supervisor/dashboard');
+      const data = await res.json();
+      setDashboard(data);
+    } catch (error) {
+      console.error('Failed to load dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadSummary = async (module = null) => {
+    try {
+      const url = module
+        ? `/onboarding/supervisor/summary?module=${encodeURIComponent(module)}`
+        : '/onboarding/supervisor/summary';
+      const res = await fetch(url);
+      const data = await res.json();
+      setSummary(data);
+    } catch (error) {
+      console.error('Failed to load summary:', error);
+    }
+  };
+
+  const loadUserDetails = async (userId) => {
+    try {
+      const res = await fetch(`/onboarding/supervisor/user/${encodeURIComponent(userId)}`);
+      const data = await res.json();
+      setUserDetails(data);
+      setSelectedUser(userId);
+    } catch (error) {
+      console.error('Failed to load user details:', error);
+    }
+  };
+
+  const handleModuleClick = (module) => {
+    const newModule = selectedModule === module ? null : module;
+    setSelectedModule(newModule);
+    loadSummary(newModule);
+  };
+
+  const filteredDashboard = selectedModule
+    ? dashboard.filter(d => d.module === selectedModule)
+    : dashboard;
+
+  if (loading) {
+    return <div className="loading">Loading dashboard...</div>;
+  }
+
+  return (
+    <div className="supervisor-dashboard">
+      <div className="dashboard-header">
+        <h1>Team Onboarding Dashboard</h1>
+        <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="summary-cards">
+        {summary.map(s => (
+          <div
+            key={s.module}
+            className={`summary-card ${selectedModule === s.module ? 'selected' : ''}`}
+            onClick={() => handleModuleClick(s.module)}
+          >
+            <h3>{s.module}</h3>
+            <div className="metric">
+              <span className="number completed">{s.completed_users}</span>
+              <span className="label">Completed</span>
+            </div>
+            <div className="metric">
+              <span className="number in-progress">{s.in_progress_users}</span>
+              <span className="label">In Progress</span>
+            </div>
+            {s.stalled_users > 0 && (
+              <div className="metric warning">
+                <span className="number stalled">{s.stalled_users}</span>
+                <span className="label">Stalled (&gt;7 days)</span>
+              </div>
+            )}
+            {s.avg_completion_days && (
+              <div className="avg-time">
+                Avg: {s.avg_completion_days} days to complete
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {summary.length === 0 && (
+        <div className="no-data">No onboarding data yet. Start onboarding some users to see data here.</div>
+      )}
+
+      {/* Filter Badge */}
+      {selectedModule && (
+        <div className="filter-badge">
+          Showing: {selectedModule}
+          <button onClick={() => { setSelectedModule(null); loadSummary(); }}>&times; Clear</button>
+        </div>
+      )}
+
+      {/* Team Progress Table */}
+      {filteredDashboard.length > 0 && (
+        <table className="progress-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Module</th>
+              <th>Progress</th>
+              <th>Status</th>
+              <th>Started</th>
+              <th>Completed</th>
+              <th>Last Activity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredDashboard.map(item => (
+              <tr key={`${item.user_id}-${item.module}`}>
+                <td>{item.user_id}</td>
+                <td>{item.module}</td>
+                <td>
+                  <div className="progress-bar-cell">
+                    <div
+                      className="progress-fill-cell"
+                      style={{ width: `${item.completion_percentage}%` }}
+                    />
+                    <span className="progress-text">
+                      {item.steps_completed}/{item.total_steps} ({item.completion_percentage}%)
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span className={`status-badge ${item.status.toLowerCase().replace(' ', '-')}`}>
+                    {item.status}
+                  </span>
+                </td>
+                <td>{new Date(item.started_at).toLocaleDateString()}</td>
+                <td>
+                  {item.completed_at
+                    ? new Date(item.completed_at).toLocaleDateString()
+                    : '-'
+                  }
+                </td>
+                <td>{new Date(item.last_activity).toLocaleDateString()}</td>
+                <td>
+                  <button
+                    onClick={() => loadUserDetails(item.user_id)}
+                    className="details-btn"
+                  >
+                    Details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {filteredDashboard.length === 0 && summary.length > 0 && (
+        <div className="no-data">
+          No onboarding data {selectedModule ? `for ${selectedModule}` : ''} yet.
+        </div>
+      )}
+
+      {/* User Details Modal */}
+      {selectedUser && userDetails && (
+        <div className="modal-overlay" onClick={() => setSelectedUser(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Onboarding Details: {selectedUser}</h2>
+            <button
+              className="close-modal"
+              onClick={() => setSelectedUser(null)}
+            >
+              &times;
+            </button>
+
+            {userDetails.map(detail => (
+              <div key={detail.module} className="user-detail-card">
+                <h3>{detail.module}</h3>
+                <p>
+                  <strong>Progress:</strong> {detail.completed_count}/{detail.total_steps} steps
+                </p>
+                {!detail.completed_at && detail.current_step_title && (
+                  <p>
+                    <strong>Current Step:</strong> {detail.current_step_title}
+                  </p>
+                )}
+                <p>
+                  <strong>Started:</strong> {new Date(detail.started_at).toLocaleString()}
+                </p>
+                {detail.completed_at && (
+                  <p>
+                    <strong>Completed:</strong> {new Date(detail.completed_at).toLocaleString()}
+                  </p>
+                )}
+                <p>
+                  <strong>Last Activity:</strong> {new Date(detail.last_activity).toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

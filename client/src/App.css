@@ -32,6 +32,13 @@ header .subtitle {
   margin-top: 0.25rem;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
 .onboarding-trigger-btn {
   background: #4CAF50;
   color: white;
@@ -40,11 +47,24 @@ header .subtitle {
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
-  margin-top: 0.75rem;
 }
 
 .onboarding-trigger-btn:hover {
   background: #45a049;
+}
+
+.supervisor-trigger-btn {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.supervisor-trigger-btn:hover {
+  background: #1976D2;
 }
 
 /* Search Bar */

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SearchBar from './components/SearchBar';
 import Answer from './components/Answer';
 import OnboardingMode from './components/OnboardingMode';
+import SupervisorDashboard from './components/SupervisorDashboard';
 import './App.css';
 
 function App() {
@@ -73,17 +74,33 @@ function App() {
     );
   }
 
+  if (mode === 'supervisor') {
+    return (
+      <div className="app" style={{ maxWidth: '1400px' }}>
+        <SupervisorDashboard onExit={() => setMode('chat')} />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header>
         <h1>WMS SOP Assistant</h1>
         <p className="subtitle">Search warehouse procedures — answers from SOPs only</p>
-        <button
-          className="onboarding-trigger-btn"
-          onClick={() => setMode('onboarding')}
-        >
-          Start Onboarding
-        </button>
+        <div className="header-buttons">
+          <button
+            className="onboarding-trigger-btn"
+            onClick={() => setMode('onboarding')}
+          >
+            Start Onboarding
+          </button>
+          <button
+            className="supervisor-trigger-btn"
+            onClick={() => setMode('supervisor')}
+          >
+            Supervisor Dashboard
+          </button>
+        </div>
       </header>
 
       <main>
