@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: wms-postgres
+    environment:
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: wms_sop
+    ports:
+      - "5432:5432"
+    volumes:
+      - wms-pgdata:/var/lib/postgresql/data
+
+volumes:
+  wms-pgdata:
