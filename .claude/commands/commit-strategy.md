@@ -24,6 +24,10 @@ Commit **immediately** after any of these events:
 
 **Minimum: 1 commit per completed phase or sub-task. Maximum gap: 30 minutes of working code without a commit.**
 
+## Push Rule
+
+**Always push to the remote upstream branch immediately after committing.** If a remote tracking branch exists (check with `git remote -v`), push after every commit. Do not accumulate local-only commits.
+
 ## Execution
 
-When it's time to commit, use the `/commit-style` skill to format the commit message properly.
+When it's time to commit, use the `/commit-style` skill to format the commit message properly. After committing, push to upstream.
