@@ -12,12 +12,11 @@ export default function Answer({ data, question, onFeedback }) {
     setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
   }
 
-  function findSourceText(docTitle, slideNumber) {
+  function findSource(docTitle, slideNumber) {
     if (!sources) return null;
-    const match = sources.find(
+    return sources.find(
       s => s.doc_title === docTitle && s.slide_number === slideNumber
-    );
-    return match ? match.text : null;
+    ) || null;
   }
 
   // Handle string answer (e.g., "Not found in SOPs")
@@ -57,7 +56,7 @@ export default function Answer({ data, question, onFeedback }) {
                 <div className="inline-citations">
                   {item.citations.map((c, j) => {
                     const key = `${i}-${c.doc_title}-${c.slide_number}`;
-                    const text = findSourceText(c.doc_title, c.slide_number);
+                    const source = findSource(c.doc_title, c.slide_number);
                     const isExpanded = expanded[key];
 
                     return (
@@ -65,15 +64,18 @@ export default function Answer({ data, question, onFeedback }) {
                         {j > 0 && ', '}
                         <button
                           className="citation-link"
-                          onClick={() => text && toggle(key)}
-                          title={text ? 'Click to view slide content' : ''}
+                          onClick={() => source && toggle(key)}
+                          title={source ? 'Click to view slide content' : ''}
                         >
                           {c.doc_title} - {c.source_locator}
-                          {text && <span className="expand-icon">{isExpanded ? ' \u25B2' : ' \u25BC'}</span>}
+                          {source && <span className="expand-icon">{isExpanded ? ' \u25B2' : ' \u25BC'}</span>}
                         </button>
-                        {isExpanded && text && (
+                        {isExpanded && source && (
                           <div className="slide-content">
-                            <pre>{text}</pre>
+                            {source.image_url && (
+                              <img src={source.image_url} alt={`${c.doc_title} - Slide ${c.slide_number}`} className="slide-image" />
+                            )}
+                            <pre>{source.text}</pre>
                           </div>
                         )}
                       </span>

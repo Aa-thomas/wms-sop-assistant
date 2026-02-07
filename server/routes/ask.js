@@ -36,7 +36,8 @@ router.post('/ask', async (req, res) => {
       doc_title: c.doc_title,
       slide_number: c.slide_number,
       source_locator: c.source_locator,
-      text: c.text
+      text: c.text,
+      image_url: `/images/${c.doc_title.replace(/\s+/g, '_')}/slide_${c.slide_number}.png`
     }));
 
     res.json(response);
