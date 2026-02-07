@@ -1,0 +1,39 @@
+{
+  "name": "wms-sop-assistant",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "extract": "node scripts/extract_pptx.js",
+    "ingest": "node scripts/ingest_postgres.js",
+    "dev": "concurrently \"npm:server\" \"npm:client\"",
+    "server": "nodemon server/index.js",
+    "client": "cd client && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aa-thomas/wms-sop-assistant.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aa-thomas/wms-sop-assistant/issues"
+  },
+  "homepage": "https://github.com/aa-thomas/wms-sop-assistant#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.73.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "node-pptx-parser": "^1.0.1",
+    "openai": "^6.18.0",
+    "pg": "^8.18.0",
+    "pgvector": "^0.2.1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11"
+  }
+}

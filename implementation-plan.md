@@ -10,7 +10,7 @@ Build the WMS SOP Assistant in 4 phases. Test each phase before moving to the ne
 
 ## Setup (30 min)
 
-### Step 1: Initialize Project
+### Step 1: Initialize Project (This has been completed for you.Begin Step 2)
 ```bash
 mkdir wms-sop-assistant
 cd wms-sop-assistant

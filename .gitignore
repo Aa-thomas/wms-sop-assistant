@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/extracted/
+data/source/
+dist/
+*.log
+prd_*
