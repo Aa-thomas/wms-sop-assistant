@@ -9,7 +9,8 @@ export default defineConfig({
       '/ask': 'http://localhost:3000',
       '/feedback': 'http://localhost:3000',
       '/health': 'http://localhost:3000',
-      '/images': 'http://localhost:3000'
+      '/images': 'http://localhost:3000',
+      '/onboarding': 'http://localhost:3000'
     }
   }
 })

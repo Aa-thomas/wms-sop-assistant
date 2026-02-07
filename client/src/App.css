@@ -32,6 +32,21 @@ header .subtitle {
   margin-top: 0.25rem;
 }
 
+.onboarding-trigger-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+}
+
+.onboarding-trigger-btn:hover {
+  background: #45a049;
+}
+
 /* Search Bar */
 .search-bar {
   margin-bottom: 1.5rem;

@@ -51,13 +51,11 @@ router.post('/feedback', async (req, res) => {
   const { question, response_id, helpful, comment } = req.body;
 
   try {
-    const { Pool } = require('pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const pool = require('../lib/db');
     await pool.query(
       'INSERT INTO feedback (question, response_id, helpful, comment) VALUES ($1, $2, $3, $4)',
       [question, response_id, helpful, comment || null]
     );
-    await pool.end();
     res.json({ success: true });
   } catch (error) {
     console.error('[FEEDBACK] Error:', error.message);

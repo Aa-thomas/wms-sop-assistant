@@ -1,8 +1,6 @@
-const { Pool } = require('pg');
 const pgvector = require('pgvector/pg');
 const { embedText } = require('./embeddings');
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = require('./db');
 
 // Register pgvector type on first connection
 let registered = false;
