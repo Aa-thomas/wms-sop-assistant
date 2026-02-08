@@ -3,14 +3,16 @@ import SearchBar from './components/SearchBar';
 import Answer from './components/Answer';
 import OnboardingMode from './components/OnboardingMode';
 import SupervisorDashboard from './components/SupervisorDashboard';
+import { SkeletonAnswer } from './components/Skeleton';
+import { useToast } from './contexts/ToastContext';
 import './App.css';
 
 function App() {
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [lastQuestion, setLastQuestion] = useState('');
   const [mode, setMode] = useState('chat');
+  const { showToast } = useToast();
   const [userId] = useState(() => {
     let id = localStorage.getItem('user_id');
     if (!id) {
@@ -22,7 +24,6 @@ function App() {
 
   async function handleSubmit(question, module) {
     setLoading(true);
-    setError(null);
     setResponse(null);
     setLastQuestion(question);
 
@@ -44,7 +45,7 @@ function App() {
       const data = await res.json();
       setResponse(data);
     } catch (err) {
-      setError(err.message);
+      showToast('error', err.message);
     } finally {
       setLoading(false);
     }
@@ -106,18 +107,7 @@ function App() {
       <main>
         <SearchBar onSubmit={handleSubmit} loading={loading} />
 
-        {loading && (
-          <div className="loading">
-            <div className="spinner"></div>
-            <span>Searching SOPs...</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="error">
-            <p>{error}</p>
-          </div>
-        )}
+        {loading && <SkeletonAnswer />}
 
         <Answer
           data={response}

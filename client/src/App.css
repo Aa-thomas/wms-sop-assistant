@@ -61,6 +61,10 @@ header .subtitle {
   background: var(--accent-primary-hover);
 }
 
+.onboarding-trigger-btn:active {
+  transform: scale(0.97);
+}
+
 .supervisor-trigger-btn {
   background: transparent;
   color: var(--text-secondary);
@@ -76,6 +80,33 @@ header .subtitle {
 .supervisor-trigger-btn:hover {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
+}
+
+.supervisor-trigger-btn:active {
+  transform: scale(0.97);
+}
+
+/* Loading / Spinner (used by OnboardingMode) */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--border-default);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Search Bar */
@@ -151,44 +182,13 @@ header .subtitle {
   cursor: not-allowed;
 }
 
-/* Loading */
-.loading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  color: var(--text-secondary);
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid var(--border-default);
-  border-top-color: var(--accent-primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Error */
-.error {
-  background: var(--status-error-bg);
-  border: 1px solid var(--status-error);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  color: var(--status-error);
-  margin-bottom: var(--space-4);
-}
-
 /* Answer */
 .answer {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
+  animation: contentIn 0.3s ease;
 }
 
 .answer-claims ul {
@@ -218,12 +218,15 @@ header .subtitle {
   color: var(--accent-primary);
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 0;
+  padding: var(--space-1);
   font-family: inherit;
+  transition: color var(--transition-default), background var(--transition-default);
 }
 
 .citation-link:hover {
   text-decoration: underline;
+  background: var(--accent-primary-light);
+  border-radius: var(--radius-sm);
 }
 
 .not-found {
@@ -284,7 +287,7 @@ header .subtitle {
 }
 
 .expand-icon {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   margin-left: var(--space-1);
 }
 
@@ -294,6 +297,7 @@ header .subtitle {
   background: var(--bg-subtle);
   border-left: 3px solid var(--accent-primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  animation: contentIn 0.25s ease;
 }
 
 .slide-content pre {
@@ -308,7 +312,7 @@ header .subtitle {
 
 .slide-image {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-2);
 }
@@ -341,10 +345,21 @@ header .subtitle {
   border-color: var(--accent-primary);
 }
 
+.feedback-buttons button.selected {
+  background: var(--accent-primary-light);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.feedback-buttons button:active {
+  transform: scale(0.95);
+}
+
 /* Mobile */
 @media (max-width: 600px) {
   .search-input-row {
     flex-direction: column;
+    gap: var(--space-3);
   }
 
   .search-input-row select {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Citations from './Citations';
+import { useToast } from '../contexts/ToastContext';
 
 export default function Answer({ data, question, onFeedback }) {
   const [expanded, setExpanded] = useState({});
@@ -118,13 +119,30 @@ function collectUniqueCitations(answer) {
 }
 
 function FeedbackButtons({ question, onFeedback }) {
+  const [selected, setSelected] = useState(null);
+  const { showToast } = useToast();
+
+  const handleClick = (helpful) => {
+    setSelected(helpful);
+    onFeedback(question, helpful);
+    showToast('success', 'Thanks for your feedback!', 2000);
+  };
+
   return (
     <div className="feedback-buttons">
       <span>Was this helpful?</span>
-      <button onClick={() => onFeedback(question, true)} title="Helpful">
+      <button
+        onClick={() => handleClick(true)}
+        className={selected === true ? 'selected' : ''}
+        title="Helpful"
+      >
         &#128077;
       </button>
-      <button onClick={() => onFeedback(question, false)} title="Not helpful">
+      <button
+        onClick={() => handleClick(false)}
+        className={selected === false ? 'selected' : ''}
+        title="Not helpful"
+      >
         &#128078;
       </button>
     </div>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useToast } from '../contexts/ToastContext';
+import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
 import './SupervisorDashboard.css';
 
 export default function SupervisorDashboard({ onExit }) {
@@ -8,6 +10,7 @@ export default function SupervisorDashboard({ onExit }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     loadDashboard();
@@ -21,6 +24,7 @@ export default function SupervisorDashboard({ onExit }) {
       setDashboard(data);
     } catch (error) {
       console.error('Failed to load dashboard:', error);
+      showToast('error', 'Failed to load dashboard data.');
     } finally {
       setLoading(false);
     }
@@ -36,6 +40,7 @@ export default function SupervisorDashboard({ onExit }) {
       setSummary(data);
     } catch (error) {
       console.error('Failed to load summary:', error);
+      showToast('error', 'Failed to load summary data.');
     }
   };
 
@@ -47,6 +52,7 @@ export default function SupervisorDashboard({ onExit }) {
       setSelectedUser(userId);
     } catch (error) {
       console.error('Failed to load user details:', error);
+      showToast('error', 'Failed to load user details.');
     }
   };
 
@@ -61,7 +67,43 @@ export default function SupervisorDashboard({ onExit }) {
     : dashboard;
 
   if (loading) {
-    return <div className="loading">Loading dashboard...</div>;
+    return (
+      <div className="supervisor-dashboard">
+        <div className="dashboard-header">
+          <h1>Team Onboarding Dashboard</h1>
+          <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
+        </div>
+        <div className="summary-cards">
+          <SkeletonSummaryCard />
+          <SkeletonSummaryCard />
+          <SkeletonSummaryCard />
+          <SkeletonSummaryCard />
+        </div>
+        <div className="table-scroll-wrapper">
+          <table className="progress-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Module</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Started</th>
+                <th>Completed</th>
+                <th>Last Activity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <SkeletonTableRow />
+              <SkeletonTableRow />
+              <SkeletonTableRow />
+              <SkeletonTableRow />
+              <SkeletonTableRow />
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -78,6 +120,9 @@ export default function SupervisorDashboard({ onExit }) {
             key={s.module}
             className={`summary-card ${selectedModule === s.module ? 'selected' : ''}`}
             onClick={() => handleModuleClick(s.module)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleModuleClick(s.module); } }}
+            tabIndex={0}
+            role="button"
           >
             <h3>{s.module}</h3>
             <div className="metric">
@@ -117,6 +162,7 @@ export default function SupervisorDashboard({ onExit }) {
 
       {/* Team Progress Table */}
       {filteredDashboard.length > 0 && (
+        <div className="table-scroll-wrapper">
         <table className="progress-table">
           <thead>
             <tr>
@@ -171,6 +217,7 @@ export default function SupervisorDashboard({ onExit }) {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {filteredDashboard.length === 0 && summary.length > 0 && (

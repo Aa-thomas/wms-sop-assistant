@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useToast } from '../contexts/ToastContext';
+import { SkeletonStep, SkeletonModuleCard } from './Skeleton';
 import './OnboardingMode.css';
 
 export default function OnboardingMode({ userId, onExit }) {
   const [step, setStep] = useState(null);
   const [modules, setModules] = useState([]);
+  const [modulesLoading, setModulesLoading] = useState(true);
   const [selectedModule, setSelectedModule] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentExplanation, setCurrentExplanation] = useState(null);
@@ -12,13 +15,18 @@ export default function OnboardingMode({ userId, onExit }) {
   const [quizResult, setQuizResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [completionMessage, setCompletionMessage] = useState(null);
+  const { showToast } = useToast();
 
   // Load available modules on mount
   useEffect(() => {
     fetch('/onboarding/available')
       .then(res => res.json())
       .then(data => setModules(data))
-      .catch(err => console.error('Failed to load modules:', err));
+      .catch(err => {
+        console.error('Failed to load modules:', err);
+        showToast('error', 'Failed to load training modules. Please refresh.');
+      })
+      .finally(() => setModulesLoading(false));
   }, []);
 
   // Start onboarding for selected module
@@ -45,6 +53,7 @@ export default function OnboardingMode({ userId, onExit }) {
 
     } catch (error) {
       console.error('Failed to start onboarding:', error);
+      showToast('error', 'Failed to start onboarding. Please try again.');
       setLoading(false);
     }
   };
@@ -67,6 +76,7 @@ export default function OnboardingMode({ userId, onExit }) {
 
     } catch (error) {
       console.error('Failed to load step:', error);
+      showToast('error', 'Failed to load step content. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,7 +101,7 @@ export default function OnboardingMode({ userId, onExit }) {
       setQuizResult(result);
     } catch (error) {
       console.error('Failed to submit answer:', error);
-      alert('Failed to check answer. Please try again.');
+      showToast('error', 'Failed to check answer. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -123,6 +133,7 @@ export default function OnboardingMode({ userId, onExit }) {
 
     } catch (error) {
       console.error('Failed to complete step:', error);
+      showToast('error', 'Failed to complete step. Please try again.');
       setLoading(false);
     }
   };
@@ -154,20 +165,31 @@ export default function OnboardingMode({ userId, onExit }) {
         </div>
 
         <div className="module-grid">
-          {modules.map(module => (
-            <div key={module.module} className="module-card">
-              <h3>{module.module}</h3>
-              <p className="step-count">{module.total_steps} steps</p>
-              <p className="topics">{module.topics}</p>
-              <button
-                onClick={() => startOnboarding(module.module)}
-                disabled={loading}
-                className="start-btn"
-              >
-                Start Learning
-              </button>
-            </div>
-          ))}
+          {modulesLoading ? (
+            <>
+              <SkeletonModuleCard />
+              <SkeletonModuleCard />
+              <SkeletonModuleCard />
+              <SkeletonModuleCard />
+              <SkeletonModuleCard />
+              <SkeletonModuleCard />
+            </>
+          ) : (
+            modules.map(module => (
+              <div key={module.module} className="module-card">
+                <h3>{module.module}</h3>
+                <p className="step-count">{module.total_steps} steps</p>
+                <p className="topics">{module.topics}</p>
+                <button
+                  onClick={() => startOnboarding(module.module)}
+                  disabled={loading}
+                  className="start-btn"
+                >
+                  Start Learning
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     );
@@ -178,9 +200,11 @@ export default function OnboardingMode({ userId, onExit }) {
     <div className="onboarding-step-view">
       {/* Progress Header */}
       <div className="onboarding-progress">
-        <button onClick={onExit} className="exit-btn">&times; Exit Onboarding</button>
-        <div className="progress-bar">
+        <div className="progress-header-row">
           <div className="module-title">{selectedModule} Module</div>
+          <button onClick={onExit} className="exit-btn">&times; Exit Onboarding</button>
+        </div>
+        <div className="progress-bar">
           <div className="step-indicator">
             Step {step?.step_number} of {step?.total_steps}
           </div>
@@ -193,7 +217,7 @@ export default function OnboardingMode({ userId, onExit }) {
       {/* Step Content */}
       <div className="step-content">
         {loading ? (
-          <div className="loading">Loading step content...</div>
+          <SkeletonStep />
         ) : currentExplanation ? (
           <>
             <h2>{step?.step_title}</h2>
@@ -304,7 +328,7 @@ export default function OnboardingMode({ userId, onExit }) {
             )}
           </>
         ) : (
-          <div>Loading...</div>
+          <SkeletonStep />
         )}
       </div>
     </div>
