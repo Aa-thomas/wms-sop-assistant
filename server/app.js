@@ -12,6 +12,7 @@ const usersRouter = require('./routes/users');
 const modulesRouter = require('./routes/modules');
 const anonymousFeedbackRouter = require('./routes/feedback');
 const briefingRouter = require('./routes/briefing');
+const operatorRouter = require('./routes/operator');
 const { authMiddleware, supervisorMiddleware } = require('./lib/auth');
 
 const app = express();
@@ -73,6 +74,9 @@ app.use('/feedback', authMiddleware, anonymousFeedbackRouter);
 
 // Daily briefing (supervisor only)
 app.use('/briefing', supervisorMiddleware, briefingRouter);
+
+// Operator dashboard (any authenticated user)
+app.use('/operator', authMiddleware, operatorRouter);
 
 // In production, serve the React build and handle client-side routing
 if (process.env.NODE_ENV === 'production') {

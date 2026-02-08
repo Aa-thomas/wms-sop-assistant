@@ -1,0 +1,3 @@
+interface:
+  display_name: "Claude Code Workflow Pack"
+  short_description: "Plan-first coding workflow + commit style and strategy"

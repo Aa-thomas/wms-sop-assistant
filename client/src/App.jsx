@@ -3,6 +3,7 @@ import SearchBar from './components/SearchBar';
 import Answer from './components/Answer';
 import OnboardingMode from './components/OnboardingMode';
 import SupervisorDashboard from './components/SupervisorDashboard';
+import OperatorDashboard from './components/OperatorDashboard';
 import LoginForm from './components/LoginForm';
 import AnonymousFeedbackForm from './components/AnonymousFeedbackForm';
 import { SkeletonAnswer } from './components/Skeleton';
@@ -155,6 +156,19 @@ function App() {
     );
   }
 
+  if (mode === 'operator') {
+    return (
+      <div className="app" style={{ maxWidth: '1400px' }}>
+        <OperatorDashboard
+          onExit={() => setMode('chat')}
+          onStartOnboarding={() => setMode('onboarding')}
+          authFetch={authedFetch}
+          currentUser={currentUser}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header>
@@ -165,6 +179,12 @@ function App() {
         <h1>WMS SOP Assistant</h1>
         <p className="subtitle">Search warehouse procedures — answers from SOPs only</p>
         <div className="header-buttons">
+          <button
+            className="operator-trigger-btn"
+            onClick={() => setMode('operator')}
+          >
+            Operator Dashboard
+          </button>
           <button
             className="onboarding-trigger-btn"
             onClick={() => setMode('onboarding')}

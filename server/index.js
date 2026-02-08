@@ -1,3 +1,9 @@
+require('dotenv').config();
+const { validateEnv } = require('./lib/validateEnv');
+
+// Validate environment before starting
+validateEnv();
+
 const app = require('./app');
 
 const PORT = process.env.PORT || 3000;

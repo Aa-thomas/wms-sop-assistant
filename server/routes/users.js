@@ -1,8 +1,14 @@
 const express = require('express');
+const { body, param, validationResult } = require('express-validator');
 const { getPool } = require('../lib/retrieval');
 const { hashPassword } = require('../lib/auth');
+const { logSecurityEvent, SECURITY_EVENTS } = require('../lib/securityLogger');
 
 const router = express.Router();
+
+// Password must be 8+ chars with at least one uppercase, lowercase, and number
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
 
 // List all users (no password hashes)
 router.get('/', async (req, res) => {
@@ -19,45 +25,52 @@ router.get('/', async (req, res) => {
 });
 
 // Create new user
-router.post('/', async (req, res) => {
-  const { username, password, is_supervisor = false } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ error: 'username and password required' });
-  }
-
-  if (username.length < 3 || username.length > 50) {
-    return res.status(400).json({ error: 'Username must be 3-50 characters' });
-  }
-
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
-
-  try {
-    const db = await getPool();
-    
-    // Check if username exists
-    const existing = await db.query('SELECT id FROM users WHERE username = $1', [username]);
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'Username already exists' });
+router.post('/',
+  body('username')
+    .trim()
+    .isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters')
+    .matches(USERNAME_REGEX).withMessage('Username can only contain letters, numbers, and underscores'),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(PASSWORD_REGEX).withMessage('Password must contain uppercase, lowercase, and a number'),
+  body('is_supervisor').optional().isBoolean(),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const passwordHash = await hashPassword(password);
-    const result = await db.query(
-      `INSERT INTO users (username, password_hash, is_supervisor, is_active)
-       VALUES ($1, $2, $3, true)
-       RETURNING id, username, is_supervisor, is_active, created_at, last_login`,
-      [username, passwordHash, is_supervisor]
-    );
+    const { username, password, is_supervisor = false } = req.body;
 
-    console.log(`[USERS] ${req.user.username} created user ${username}`);
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error('[USERS] Create failed:', error.message);
-    res.status(500).json({ error: 'Failed to create user' });
+    try {
+      const db = await getPool();
+      
+      // Check if username exists
+      const existing = await db.query('SELECT id FROM users WHERE username = $1', [username]);
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: 'Username already exists' });
+      }
+
+      const passwordHash = await hashPassword(password);
+      const result = await db.query(
+        `INSERT INTO users (username, password_hash, is_supervisor, is_active)
+         VALUES ($1, $2, $3, true)
+         RETURNING id, username, is_supervisor, is_active, created_at, last_login`,
+        [username, passwordHash, is_supervisor]
+      );
+
+      logSecurityEvent(SECURITY_EVENTS.USER_CREATED, {
+        actor: req.user.username,
+        targetUser: username,
+        is_supervisor
+      });
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error('[USERS] Create failed:', error.message);
+      res.status(500).json({ error: 'Failed to create user' });
+    }
   }
-});
+);
 
 // Update user role (supervisor flag)
 router.patch('/:id/role', async (req, res) => {
@@ -84,7 +97,11 @@ router.patch('/:id/role', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log(`[USERS] ${req.user.username} set is_supervisor=${is_supervisor} for user ${result.rows[0].username}`);
+    logSecurityEvent(SECURITY_EVENTS.ROLE_CHANGED, {
+      actor: req.user.username,
+      targetUser: result.rows[0].username,
+      is_supervisor
+    });
     res.json(result.rows[0]);
   } catch (error) {
     console.error('[USERS] Role update failed:', error.message);
@@ -117,7 +134,10 @@ router.patch('/:id/status', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log(`[USERS] ${req.user.username} set is_active=${is_active} for user ${result.rows[0].username}`);
+    logSecurityEvent(is_active ? SECURITY_EVENTS.USER_ENABLED : SECURITY_EVENTS.USER_DISABLED, {
+      actor: req.user.username,
+      targetUser: result.rows[0].username
+    });
     res.json(result.rows[0]);
   } catch (error) {
     console.error('[USERS] Status update failed:', error.message);
@@ -126,13 +146,18 @@ router.patch('/:id/status', async (req, res) => {
 });
 
 // Set user password
-router.patch('/:id/password', async (req, res) => {
-  const { id } = req.params;
-  const { password } = req.body;
+router.patch('/:id/password',
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(PASSWORD_REGEX).withMessage('Password must contain uppercase, lowercase, and a number'),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  if (!password || password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
+    const { id } = req.params;
+    const { password } = req.body;
 
   try {
     const db = await getPool();
@@ -147,7 +172,10 @@ router.patch('/:id/password', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log(`[USERS] ${req.user.username} reset password for user ${result.rows[0].username}`);
+    logSecurityEvent(SECURITY_EVENTS.PASSWORD_CHANGED, {
+      actor: req.user.username,
+      targetUser: result.rows[0].username
+    });
     res.json({ success: true, message: 'Password updated' });
   } catch (error) {
     console.error('[USERS] Password update failed:', error.message);
@@ -175,7 +203,10 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log(`[USERS] ${req.user.username} deleted user ${result.rows[0].username}`);
+    logSecurityEvent(SECURITY_EVENTS.USER_DELETED, {
+      actor: req.user.username,
+      targetUser: result.rows[0].username
+    });
     res.json({ success: true, message: 'User deleted' });
   } catch (error) {
     console.error('[USERS] Delete failed:', error.message);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
+import { SkeletonLine } from './Skeleton';
 import './DailyBriefing.css';
 
 export default function DailyBriefing({ authFetch, onNavigateTab }) {
@@ -56,9 +57,49 @@ export default function DailyBriefing({ authFetch, onNavigateTab }) {
 
   if (loading) {
     return (
-      <div className="briefing-loading">
-        <div className="spinner" />
-        <span>Generating your daily briefing...</span>
+      <div className="daily-briefing briefing-loading-skeleton">
+        <div className="briefing-header">
+          <div className="briefing-greeting">
+            <SkeletonLine style={{ height: '1.8rem', width: '16rem' }} />
+            <SkeletonLine style={{ height: '0.9rem', width: '14rem' }} />
+          </div>
+          <SkeletonLine style={{ height: '2rem', width: '6.5rem', borderRadius: 'var(--radius)' }} />
+        </div>
+
+        <div className="briefing-metrics">
+          <div className="briefing-skeleton-card">
+            <SkeletonLine style={{ height: '2rem', width: '3rem' }} />
+            <SkeletonLine style={{ height: '0.85rem', width: '7rem' }} />
+            <SkeletonLine style={{ height: '0.8rem', width: '6rem' }} />
+          </div>
+          <div className="briefing-skeleton-card">
+            <SkeletonLine style={{ height: '2rem', width: '3rem' }} />
+            <SkeletonLine style={{ height: '0.85rem', width: '7rem' }} />
+            <SkeletonLine style={{ height: '0.8rem', width: '5rem' }} />
+          </div>
+          <div className="briefing-skeleton-card">
+            <SkeletonLine style={{ height: '2rem', width: '3rem' }} />
+            <SkeletonLine style={{ height: '0.85rem', width: '8.5rem' }} />
+            <SkeletonLine style={{ height: '0.8rem', width: '5.5rem' }} />
+          </div>
+          <div className="briefing-skeleton-card">
+            <SkeletonLine style={{ height: '2rem', width: '3rem' }} />
+            <SkeletonLine style={{ height: '0.85rem', width: '7.5rem' }} />
+            <SkeletonLine style={{ height: '0.8rem', width: '6rem' }} />
+          </div>
+          <div className="briefing-skeleton-card">
+            <SkeletonLine style={{ height: '2rem', width: '3rem' }} />
+            <SkeletonLine style={{ height: '0.85rem', width: '6.5rem' }} />
+            <SkeletonLine style={{ height: '0.8rem', width: '5.5rem' }} />
+          </div>
+        </div>
+
+        <div className="briefing-skeleton-block">
+          <SkeletonLine style={{ height: '1rem', width: '9rem' }} />
+          <SkeletonLine style={{ height: '0.95rem', width: '100%' }} />
+          <SkeletonLine style={{ height: '0.95rem', width: '92%' }} />
+          <SkeletonLine style={{ height: '0.95rem', width: '84%' }} />
+        </div>
       </div>
     );
   }

@@ -49,28 +49,43 @@ export default function Answer({ data, interactionId, onFeedback }) {
   return (
     <div className="answer">
       <div className="answer-claims">
-        <ul>
+        <ol className="step-list">
           {answer.map((item, i) => (
-            <li key={i}>
-              <div>{item.claim}</div>
+            <li key={i} className="step-item">
+              <div className="step-title">Step {i + 1}</div>
+              <div className="step-claim">{item.claim}</div>
               {item.citations && item.citations.length > 0 && (
                 <div className="inline-citations">
-                  {item.citations.map((c, j) => {
+                  <span className="step-links-label">Relevant slides:</span>
+                  {collectStepCitations(item).map((c, j) => {
                     const key = `${i}-${c.doc_title}-${c.slide_number}`;
                     const source = findSource(c.doc_title, c.slide_number);
                     const isExpanded = expanded[key];
+                    const label = `${c.doc_title} - ${c.source_locator || `Slide ${c.slide_number}`}`;
 
                     return (
-                      <span key={j}>
-                        {j > 0 && ', '}
-                        <button
-                          className="citation-link"
-                          onClick={() => source && toggle(key)}
-                          title={source ? 'Click to view slide content' : ''}
-                        >
-                          {c.doc_title} - {c.source_locator}
-                          {source && <span className="expand-icon">{isExpanded ? ' \u25B2' : ' \u25BC'}</span>}
-                        </button>
+                      <div key={j} className="step-link-row">
+                        {source?.image_url ? (
+                          <a
+                            className="citation-link"
+                            href={source.image_url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {label}
+                          </a>
+                        ) : (
+                          <span className="citation-text">{label}</span>
+                        )}
+                        {source && (
+                          <button
+                            className="citation-preview-btn"
+                            onClick={() => toggle(key)}
+                            title="Preview slide content"
+                          >
+                            {isExpanded ? 'Hide preview' : 'Preview'}
+                          </button>
+                        )}
                         {isExpanded && source && (
                           <div className="slide-content">
                             {source.image_url && (
@@ -79,14 +94,14 @@ export default function Answer({ data, interactionId, onFeedback }) {
                             <pre>{source.text}</pre>
                           </div>
                         )}
-                      </span>
+                      </div>
                     );
                   })}
                 </div>
               )}
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
 
       {follow_up_question && (
@@ -99,6 +114,19 @@ export default function Answer({ data, interactionId, onFeedback }) {
       <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
     </div>
   );
+}
+
+function collectStepCitations(item) {
+  const unique = new Set();
+  const citations = [];
+  (item.citations || []).forEach(c => {
+    const key = `${c.doc_title}-${c.slide_number}`;
+    if (!unique.has(key)) {
+      unique.add(key);
+      citations.push(c);
+    }
+  });
+  return citations;
 }
 
 function collectUniqueCitations(answer) {

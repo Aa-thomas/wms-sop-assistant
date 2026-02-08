@@ -1,0 +1,212 @@
+.personal-health {
+  padding: var(--space-4);
+}
+
+.health-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  padding: var(--space-5);
+  background: var(--bg-surface);
+  margin-bottom: var(--space-5);
+}
+
+.health-banner.healthy {
+  background: var(--status-success-bg);
+  border-color: var(--status-success);
+}
+
+.health-banner.attention {
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning);
+}
+
+.health-banner.at-risk {
+  background: var(--status-error-bg);
+  border-color: var(--status-error);
+}
+
+.health-status-icon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.health-status-text h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+.health-status-text p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+}
+
+.health-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.activity-info {
+  margin-bottom: var(--space-5);
+  color: var(--text-secondary);
+}
+
+.activity-label {
+  margin-right: var(--space-2);
+}
+
+.improvement-section,
+.not-started-section,
+.all-good-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.improvement-section h3,
+.not-started-section h3 {
+  margin: 0 0 var(--space-3);
+}
+
+.weakness-group + .weakness-group {
+  margin-top: var(--space-4);
+}
+
+.weakness-group h4 {
+  margin: 0 0 var(--space-2);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.weakness-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.weakness-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--bg-subtle);
+}
+
+.weakness-item.quiz-failure {
+  border-left: 3px solid var(--status-warning);
+}
+
+.weakness-item.stalled {
+  border-left: 3px solid var(--status-error);
+}
+
+.weakness-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weakness-module {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.weakness-info {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.eventually-correct {
+  margin-left: auto;
+  color: var(--status-success);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.section-description {
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-2);
+}
+
+.module-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.module-tag {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-3);
+  font-size: 0.8rem;
+}
+
+.all-good-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--status-success-bg);
+  border-color: var(--status-success);
+  color: var(--status-success);
+}
+
+.all-good-section p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .health-stats-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .health-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .health-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .eventually-correct {
+    margin-left: 0;
+  }
+}

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../lib/db');
 const { comparePassword, generateToken, authMiddleware } = require('../lib/auth');
+const { logSecurityEvent, SECURITY_EVENTS } = require('../lib/securityLogger');
 
 /**
  * POST /auth/login
@@ -21,6 +22,11 @@ router.post('/login', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
+      logSecurityEvent(SECURITY_EVENTS.LOGIN_FAILED, {
+        username,
+        ip: req.ip,
+        reason: 'user_not_found'
+      });
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
@@ -28,12 +34,22 @@ router.post('/login', async (req, res) => {
 
     // Check if user is disabled
     if (user.is_active === false) {
+      logSecurityEvent(SECURITY_EVENTS.LOGIN_BLOCKED, {
+        username,
+        ip: req.ip,
+        reason: 'account_disabled'
+      });
       return res.status(403).json({ error: 'Account is disabled. Contact your supervisor.' });
     }
 
     const valid = await comparePassword(password, user.password_hash);
 
     if (!valid) {
+      logSecurityEvent(SECURITY_EVENTS.LOGIN_FAILED, {
+        username,
+        ip: req.ip,
+        reason: 'invalid_password'
+      });
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
@@ -41,6 +57,11 @@ router.post('/login', async (req, res) => {
     await db.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
 
     const token = generateToken(user);
+
+    logSecurityEvent(SECURITY_EVENTS.LOGIN_SUCCESS, {
+      username,
+      ip: req.ip
+    });
 
     res.json({
       token,

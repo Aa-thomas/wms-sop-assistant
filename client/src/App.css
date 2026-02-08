@@ -93,6 +93,27 @@ header .subtitle {
   transform: scale(0.97);
 }
 
+.operator-trigger-btn {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.operator-trigger-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.operator-trigger-btn:active {
+  transform: scale(0.97);
+}
+
 .supervisor-trigger-btn {
   background: transparent;
   color: var(--text-secondary);
@@ -285,27 +306,97 @@ header .subtitle {
   border-bottom: none;
 }
 
+.step-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.step-item {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+}
+
+.step-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-1);
+}
+
+.step-claim {
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
 .inline-citations {
   color: var(--accent-primary);
   font-size: 0.85rem;
-  margin-top: var(--space-1);
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.step-links-label {
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.step-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .citation-link {
   background: none;
-  border: none;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
   color: var(--accent-primary);
   font-size: 0.85rem;
   cursor: pointer;
-  padding: var(--space-1);
+  padding: 0.22rem 0.6rem;
   font-family: inherit;
+  text-decoration: none;
   transition: color var(--transition-default), background var(--transition-default);
 }
 
 .citation-link:hover {
-  text-decoration: underline;
   background: var(--accent-primary-light);
-  border-radius: var(--radius-sm);
+  border-color: var(--accent-primary);
+}
+
+.citation-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.citation-preview-btn {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0.22rem 0.6rem;
+  font-family: inherit;
+}
+
+.citation-preview-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .not-found {
