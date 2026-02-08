@@ -8,6 +8,13 @@ import { SkeletonAnswer } from './components/Skeleton';
 import { useToast } from './contexts/ToastContext';
 import './App.css';
 
+const STARTER_PROMPTS = [
+  { icon: '📦', title: 'Inbound Orders', question: 'How do I process an inbound order?', module: 'Inbound' },
+  { icon: '🔄', title: 'Cycle Counting', question: 'What are the steps for cycle counting?', module: 'CycleCounts' },
+  { icon: '↩️', title: 'Returns', question: 'How do I handle customer returns?', module: 'Returns' },
+  { icon: '🎯', title: 'Pick Process', question: "What's the pick process at a PPS station?", module: 'Picking' },
+];
+
 function authFetch(url, options = {}) {
   const token = localStorage.getItem('auth_token');
   return fetch(url, {
@@ -175,6 +182,22 @@ function App() {
 
       <main>
         <SearchBar onSubmit={handleSubmit} loading={loading} />
+
+        {!response && !loading && (
+          <div className="starter-prompts">
+            {STARTER_PROMPTS.map((prompt) => (
+              <button
+                key={prompt.title}
+                className="starter-card"
+                onClick={() => handleSubmit(prompt.question, prompt.module)}
+              >
+                <span className="starter-icon">{prompt.icon}</span>
+                <span className="starter-title">{prompt.title}</span>
+                <span className="starter-question">{prompt.question}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {loading && <SkeletonAnswer />}
 
