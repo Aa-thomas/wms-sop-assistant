@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { useToast } from '../contexts/ToastContext';
+import PickErrorTrendChart from './PickErrorTrendChart';
 import './PickErrors.css';
 
 export default function PickErrors({ authFetch }) {
@@ -12,6 +13,7 @@ export default function PickErrors({ authFetch }) {
   const [showLogModal, setShowLogModal] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [trendData, setTrendData] = useState(null);
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
 
@@ -26,7 +28,7 @@ export default function PickErrors({ authFetch }) {
   });
 
   useEffect(() => {
-    Promise.all([loadErrors(), loadUsers()]).finally(() => setLoading(false));
+    Promise.all([loadErrors(), loadUsers(), loadTrends()]).finally(() => setLoading(false));
   }, []);
 
   const loadErrors = async (userId = null) => {
@@ -51,6 +53,17 @@ export default function PickErrors({ authFetch }) {
     }
   };
 
+  const loadTrends = async (userId = null) => {
+    try {
+      const url = userId ? `/pick-errors/trends?user_id=${encodeURIComponent(userId)}` : '/pick-errors/trends';
+      const res = await authFetch(url);
+      const data = await res.json();
+      setTrendData(data);
+    } catch (error) {
+      console.error('Failed to load trend data:', error);
+    }
+  };
+
   const loadUserSummary = async (userId) => {
     try {
       const res = await authFetch(`/pick-errors/user/${encodeURIComponent(userId)}/summary`);
@@ -68,9 +81,9 @@ export default function PickErrors({ authFetch }) {
     setUserSummary(null);
 
     if (userId) {
-      await Promise.all([loadErrors(userId), loadUserSummary(userId)]);
+      await Promise.all([loadErrors(userId), loadUserSummary(userId), loadTrends(userId)]);
     } else {
-      await loadErrors();
+      await Promise.all([loadErrors(), loadTrends()]);
     }
   };
 
@@ -115,9 +128,9 @@ export default function PickErrors({ authFetch }) {
 
       // Refresh data
       if (selectedUserId) {
-        await Promise.all([loadErrors(selectedUserId), loadUserSummary(selectedUserId)]);
+        await Promise.all([loadErrors(selectedUserId), loadUserSummary(selectedUserId), loadTrends(selectedUserId)]);
       } else {
-        await loadErrors();
+        await Promise.all([loadErrors(), loadTrends()]);
       }
     } catch (error) {
       console.error('Failed to save pick error:', error);
@@ -218,6 +231,9 @@ export default function PickErrors({ authFetch }) {
           </div>
         </div>
       )}
+
+      {/* Trend Chart */}
+      <PickErrorTrendChart trendData={trendData} />
 
       {/* AI Coaching Section (when user selected) */}
       {selectedUserId && (

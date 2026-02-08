@@ -53,6 +53,78 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Weekly error trends (last 90 days)
+router.get('/trends', async (req, res) => {
+  const { user_id } = req.query;
+
+  try {
+    const db = await getPool();
+
+    let query = `
+      SELECT
+        DATE_TRUNC('week', pe.created_at)::date AS week,
+        pe.user_id,
+        u.username,
+        COUNT(*)::int AS error_count
+      FROM pick_errors pe
+      LEFT JOIN users u ON pe.user_id = u.id::text
+      WHERE pe.created_at > NOW() - INTERVAL '90 days'
+    `;
+    const params = [];
+
+    if (user_id) {
+      params.push(user_id);
+      query += ` AND pe.user_id = $${params.length}`;
+    }
+
+    query += ` GROUP BY week, pe.user_id, u.username ORDER BY week ASC`;
+
+    const result = await db.query(query, params);
+
+    // Build week list (all weeks in the 90-day window)
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() - 90);
+    // Align to Monday
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+
+    const weeks = [];
+    const cursor = new Date(start);
+    while (cursor <= now) {
+      weeks.push(cursor.toISOString().split('T')[0]);
+      cursor.setDate(cursor.getDate() + 7);
+    }
+
+    // Collect unique users and their data
+    const series = {};
+    const usernames = {};
+
+    for (const row of result.rows) {
+      const uid = row.user_id;
+      if (!series[uid]) {
+        series[uid] = new Array(weeks.length).fill(0);
+        usernames[uid] = row.username || `User ${uid}`;
+      }
+      const weekStr = new Date(row.week).toISOString().split('T')[0];
+      const idx = weeks.indexOf(weekStr);
+      if (idx !== -1) {
+        series[uid][idx] = row.error_count;
+      }
+    }
+
+    // Format weeks for display (e.g. "Jan 6")
+    const formattedWeeks = weeks.map(w => {
+      const d = new Date(w + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    res.json({ weeks: formattedWeeks, series, usernames });
+  } catch (error) {
+    console.error('[PICK-ERRORS] Trends failed:', error.message);
+    res.status(500).json({ error: 'Failed to load trend data' });
+  }
+});
+
 // Per-user error summary
 router.get('/user/:user_id/summary', async (req, res) => {
   const { user_id } = req.params;

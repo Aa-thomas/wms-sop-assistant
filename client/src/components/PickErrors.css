@@ -110,6 +110,35 @@
   margin-top: var(--space-1);
 }
 
+/* Trend Chart */
+.trend-chart-section {
+  margin-bottom: var(--space-6);
+}
+
+.trend-chart-section h3 {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.trend-chart-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.trend-chart-empty {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
 /* AI Coaching Section */
 .coaching-section {
   margin-bottom: var(--space-6);
@@ -396,6 +425,10 @@
 
   .error-summary-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .trend-chart-container {
+    padding: var(--space-3);
   }
 
   .error-log-table {
