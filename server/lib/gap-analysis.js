@@ -160,8 +160,7 @@ function clusterGapSignals(interactions, feedbackItems) {
     }
   }
 
-  // Filter: need at least 2 signals (questions + feedback combined)
-  return clusters.filter(c => (c.questions.length + c.feedback.length) >= 2);
+  return clusters;
 }
 
 /**
@@ -330,12 +329,18 @@ async function analyzeGaps(periodDays = 7) {
 
     // Cluster questions and feedback together
     const clusters = clusterGapSignals(interactions, feedbackItems);
-    console.log(`[GAP] Formed ${clusters.length} clusters (>= 2 signals each)`);
+    console.log(`[GAP] Formed ${clusters.length} clusters`);
 
     // Generate titles and insert gaps
     const gaps = [];
     for (const cluster of clusters) {
-      const { title, description } = await generateClusterTitle(cluster);
+      let title, description;
+      if (cluster.questions.length === 1 && cluster.feedback.length === 0) {
+        title = cluster.questions[0].substring(0, 80);
+        description = 'Single unanswered or unhelpful question flagged by user.';
+      } else {
+        ({ title, description } = await generateClusterTitle(cluster));
+      }
       const severity = determineSeverity(cluster, interactions);
       const suggestedModule = inferModule(cluster);
       const sampleQuestions = cluster.questions.slice(0, 5);
