@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Password must be 8+ chars with at least one uppercase letter, one number, and one special character
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
-const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
+const USERNAME_REGEX = /^[a-zA-Z0-9_.]+$/;
 
 // List all users (no password hashes)
 router.get('/', async (req, res) => {
@@ -29,7 +29,7 @@ router.post('/',
   body('username')
     .trim()
     .isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters')
-    .matches(USERNAME_REGEX).withMessage('Username can only contain letters, numbers, and underscores'),
+    .matches(USERNAME_REGEX).withMessage('Username can only contain letters, numbers, underscores, and periods'),
   body('password')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
     .matches(PASSWORD_REGEX).withMessage('Password must contain at least one uppercase letter, one number, and one special character'),
