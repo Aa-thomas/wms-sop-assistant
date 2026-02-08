@@ -6,8 +6,8 @@ const { logSecurityEvent, SECURITY_EVENTS } = require('../lib/securityLogger');
 
 const router = express.Router();
 
-// Password must be 8+ chars with at least one uppercase, lowercase, and number
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+// Password must be 8+ chars with at least one uppercase letter and one number
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
 
 // List all users (no password hashes)
@@ -32,7 +32,7 @@ router.post('/',
     .matches(USERNAME_REGEX).withMessage('Username can only contain letters, numbers, and underscores'),
   body('password')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-    .matches(PASSWORD_REGEX).withMessage('Password must contain uppercase, lowercase, and a number'),
+    .matches(PASSWORD_REGEX).withMessage('Password must contain at least one uppercase letter and a number'),
   body('is_supervisor').optional().isBoolean(),
   async (req, res) => {
     const errors = validationResult(req);
@@ -149,7 +149,7 @@ router.patch('/:id/status', async (req, res) => {
 router.patch('/:id/password',
   body('password')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-    .matches(PASSWORD_REGEX).withMessage('Password must contain uppercase, lowercase, and a number'),
+    .matches(PASSWORD_REGEX).withMessage('Password must contain at least one uppercase letter and a number'),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

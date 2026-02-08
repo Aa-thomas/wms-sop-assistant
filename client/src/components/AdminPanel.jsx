@@ -395,7 +395,7 @@ export default function AdminPanel({ authFetch, currentUserId }) {
                   onChange={e => setNewUser(prev => ({ ...prev, password: e.target.value }))}
                   required
                   minLength={8}
-                  placeholder="Min 8 chars, uppercase, lowercase, number"
+                  placeholder="Min 8 chars, one uppercase letter, one number"
                 />
               </div>
               <div className="form-group checkbox">
@@ -432,7 +432,7 @@ export default function AdminPanel({ authFetch, currentUserId }) {
                   onChange={e => setNewPassword(e.target.value)}
                   required
                   minLength={8}
-                  placeholder="Min 8 chars, uppercase, lowercase, number"
+                  placeholder="Min 8 chars, one uppercase letter, one number"
                   autoFocus
                 />
               </div>
