@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
+import { SkeletonLine } from './Skeleton';
 import './PersonalBriefing.css';
 
 export default function PersonalBriefing({ authFetch, onNavigateTab }) {
@@ -69,14 +70,39 @@ export default function PersonalBriefing({ authFetch, onNavigateTab }) {
 
   if (loading) {
     return (
-      <div className="personal-briefing loading">
+      <div className="personal-briefing">
         <div className="briefing-header">
-          <h2>{getGreeting()}</h2>
-          <div className="briefing-date">{formatDate()}</div>
+          <div className="greeting-section">
+            <h2>{getGreeting()}</h2>
+            <div className="briefing-date">{formatDate()}</div>
+          </div>
+          <SkeletonLine style={{ height: '2rem', width: '5.5rem', borderRadius: 'var(--radius-full)' }} />
         </div>
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Preparing your personalized briefing...</p>
+
+        <div className="metrics-cards">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="metric-card skeleton-metric-card">
+              <SkeletonLine style={{ height: '1.5rem', width: '3rem', margin: '0 auto' }} />
+              <SkeletonLine style={{ height: '0.7rem', width: '5rem', margin: '0 auto' }} />
+            </div>
+          ))}
+        </div>
+
+        <div className="briefing-section">
+          <SkeletonLine style={{ height: '1rem', width: '8rem' }} />
+          <SkeletonLine style={{ height: '0.9rem', width: '100%', marginTop: 'var(--space-3)' }} />
+          <SkeletonLine style={{ height: '0.9rem', width: '90%', marginTop: 'var(--space-2)' }} />
+          <SkeletonLine style={{ height: '0.9rem', width: '75%', marginTop: 'var(--space-2)' }} />
+        </div>
+
+        <div className="briefing-section">
+          <SkeletonLine style={{ height: '1rem', width: '7rem' }} />
+          {[1, 2].map(i => (
+            <div key={i} className="skeleton-tip" style={{ marginTop: 'var(--space-3)' }}>
+              <SkeletonLine style={{ height: '0.9rem', width: '40%' }} />
+              <SkeletonLine style={{ height: '0.85rem', width: '85%', marginTop: 'var(--space-2)' }} />
+            </div>
+          ))}
         </div>
       </div>
     );

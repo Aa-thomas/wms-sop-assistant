@@ -4,6 +4,7 @@ import { useToast } from '../contexts/ToastContext';
 
 export default function Answer({ data, interactionId, onFeedback }) {
   const [expanded, setExpanded] = useState({});
+  const [missingImages, setMissingImages] = useState({});
 
   if (!data) return null;
 
@@ -50,57 +51,86 @@ export default function Answer({ data, interactionId, onFeedback }) {
     <div className="answer">
       <div className="answer-claims">
         <ol className="step-list">
-          {answer.map((item, i) => (
-            <li key={i} className="step-item">
-              <div className="step-title">Step {i + 1}</div>
-              <div className="step-claim">{item.claim}</div>
-              {item.citations && item.citations.length > 0 && (
-                <div className="inline-citations">
-                  <span className="step-links-label">Relevant slides:</span>
-                  {collectStepCitations(item).map((c, j) => {
-                    const key = `${i}-${c.doc_title}-${c.slide_number}`;
-                    const source = findSource(c.doc_title, c.slide_number);
-                    const isExpanded = expanded[key];
-                    const label = `${c.doc_title} - ${c.source_locator || `Slide ${c.slide_number}`}`;
+          {answer.map((item, i) => {
+            const stepSources = collectStepSources(item, sources || []);
+            const hasSlides = stepSources.length > 0;
+            const isExpanded = !!expanded[`step-${i}`];
 
-                    return (
-                      <div key={j} className="step-link-row">
-                        {source?.image_url ? (
-                          <a
+            return (
+            <li
+              key={i}
+              className={`step-item ${hasSlides ? 'has-slide' : ''} ${isExpanded ? 'expanded' : ''}`}
+              onClick={() => hasSlides && toggle(`step-${i}`)}
+              onKeyDown={(e) => {
+                if (hasSlides && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault();
+                  toggle(`step-${i}`);
+                }
+              }}
+              role={hasSlides ? 'button' : undefined}
+              tabIndex={hasSlides ? 0 : undefined}
+            >
+              <div className="step-head">
+                <div className="step-index">{i + 1}</div>
+                <div className="step-body">
+                  <div className="step-claim">{item.claim}</div>
+                  {collectStepCitations(item).length > 0 && (
+                    <div className="inline-citations">
+                      {collectStepCitations(item).map((c, j) => {
+                        const label = `${c.doc_title} - ${c.source_locator || `Slide ${c.slide_number}`}`;
+                        const source = findSource(c.doc_title, c.slide_number);
+
+                        return source?.image_url ? (
+                          <button
+                            key={j}
+                            type="button"
                             className="citation-link"
-                            href={source.image_url}
-                            target="_blank"
-                            rel="noreferrer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggle(`step-${i}`);
+                            }}
                           >
                             {label}
-                          </a>
-                        ) : (
-                          <span className="citation-text">{label}</span>
-                        )}
-                        {source && (
-                          <button
-                            className="citation-preview-btn"
-                            onClick={() => toggle(key)}
-                            title="Preview slide content"
-                          >
-                            {isExpanded ? 'Hide preview' : 'Preview'}
                           </button>
-                        )}
-                        {isExpanded && source && (
-                          <div className="slide-content">
-                            {source.image_url && (
-                              <img src={source.image_url} alt={`${c.doc_title} - Slide ${c.slide_number}`} className="slide-image" />
-                            )}
-                            <pre>{source.text}</pre>
-                          </div>
-                        )}
+                        ) : (
+                          <span key={j} className="citation-text">{label}</span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                {hasSlides && (
+                  <div className="step-chevron" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+              {isExpanded && (
+                <div className="step-slide-panel">
+                  {stepSources.map((entry, j) => (
+                    <div key={j} className="slide-content">
+                      <div className="step-slide-label">
+                        {entry.citation.doc_title} - {entry.citation.source_locator || `Slide ${entry.citation.slide_number}`}
                       </div>
-                    );
-                  })}
+                      {entry.source.image_url && (
+                        <img
+                          src={entry.source.image_url}
+                          alt={`${entry.citation.doc_title} - Slide ${entry.citation.slide_number}`}
+                          className="slide-image"
+                          onError={() => setMissingImages(prev => ({ ...prev, [entry.source.image_url]: true }))}
+                          style={missingImages[entry.source.image_url] ? { display: 'none' } : undefined}
+                        />
+                      )}
+                      <pre>{entry.source.text}</pre>
+                    </div>
+                  ))}
                 </div>
               )}
             </li>
-          ))}
+          );
+          })}
         </ol>
       </div>
 
@@ -114,6 +144,21 @@ export default function Answer({ data, interactionId, onFeedback }) {
       <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
     </div>
   );
+}
+
+function collectStepSources(item, sources) {
+  const seen = new Set();
+  const rows = [];
+  (item.citations || []).forEach(c => {
+    const key = `${c.doc_title}-${c.slide_number}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    const source = sources.find(
+      s => s.doc_title === c.doc_title && s.slide_number === c.slide_number
+    );
+    if (source) rows.push({ citation: c, source });
+  });
+  return rows;
 }
 
 function collectStepCitations(item) {
