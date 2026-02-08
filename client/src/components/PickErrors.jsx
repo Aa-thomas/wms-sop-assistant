@@ -24,6 +24,7 @@ export default function PickErrors({ authFetch }) {
     shipment_number: '',
     item: '',
     quantity_variance: '',
+    picked_from_location: '',
     notes: ''
   });
 
@@ -124,7 +125,7 @@ export default function PickErrors({ authFetch }) {
 
       showToast('success', 'Pick error recorded.');
       setShowLogModal(false);
-      setFormData({ user_id: '', pps_number: '', shipment_number: '', item: '', quantity_variance: '', notes: '' });
+      setFormData({ user_id: '', pps_number: '', shipment_number: '', item: '', quantity_variance: '', picked_from_location: '', notes: '' });
 
       // Refresh data
       if (selectedUserId) {
@@ -289,6 +290,7 @@ export default function PickErrors({ authFetch }) {
                 <th>PPS</th>
                 <th>Shipment</th>
                 <th>Item</th>
+                <th>Location</th>
                 <th>Variance</th>
                 <th>Notes</th>
               </tr>
@@ -301,6 +303,7 @@ export default function PickErrors({ authFetch }) {
                   <td>{err.pps_number}</td>
                   <td>{err.shipment_number}</td>
                   <td>{err.item}</td>
+                  <td>{err.picked_from_location || '-'}</td>
                   <td>
                     <span className={`variance-badge ${err.quantity_variance < 0 ? 'short' : 'over'}`}>
                       {err.quantity_variance > 0 ? '+' : ''}{err.quantity_variance}
@@ -379,6 +382,17 @@ export default function PickErrors({ authFetch }) {
                   value={formData.item}
                   onChange={e => setFormData({ ...formData, item: e.target.value })}
                   required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="error-location">Picked From Location</label>
+                <input
+                  id="error-location"
+                  type="text"
+                  placeholder="e.g. A-01-03-02"
+                  value={formData.picked_from_location}
+                  onChange={e => setFormData({ ...formData, picked_from_location: e.target.value })}
                 />
               </div>
 

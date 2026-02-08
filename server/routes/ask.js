@@ -4,6 +4,7 @@ const { retrieve, getPool } = require('../lib/retrieval');
 const { buildPrompt } = require('../lib/prompt');
 const { generate } = require('../lib/generate');
 const { findGoldenAnswer } = require('../lib/golden');
+const { normalizeStepwiseAnswer } = require('../lib/answer-format');
 
 const router = express.Router();
 
@@ -38,7 +39,8 @@ router.post('/ask', async (req, res) => {
     const prompt = buildPrompt(question, chunks, goldenExample);
 
     // 4. Generate answer
-    const response = await generate(prompt);
+    const rawResponse = await generate(prompt);
+    const response = normalizeStepwiseAnswer(question, rawResponse);
     console.log(`[ASK] Generated response (${Date.now() - start}ms total)`);
 
     // 5. Log interaction (non-blocking, failure won't break response)

@@ -42,6 +42,12 @@ Return valid JSON with this exact structure:
   }
 }
 
+PROCEDURAL QUESTION RULE:
+- If the user asks "how", "steps", "process", or similar:
+  - Return one discrete action per answer item
+  - Keep each claim focused on a single step (do not combine multiple actions into one claim)
+  - Preserve chronological order
+
 IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanation.
 
 Context:

@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Record a new pick error
 router.post('/', async (req, res) => {
-  const { user_id, pps_number, shipment_number, item, quantity_variance, notes } = req.body;
+  const { user_id, pps_number, shipment_number, item, quantity_variance, notes, picked_from_location } = req.body;
 
   if (!user_id || !pps_number || !shipment_number || !item || quantity_variance === undefined) {
     return res.status(400).json({ error: 'Missing required fields: user_id, pps_number, shipment_number, item, quantity_variance' });
@@ -16,10 +16,10 @@ router.post('/', async (req, res) => {
   try {
     const db = await getPool();
     const result = await db.query(
-      `INSERT INTO pick_errors (user_id, pps_number, shipment_number, item, quantity_variance, notes, recorded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO pick_errors (user_id, pps_number, shipment_number, item, quantity_variance, notes, picked_from_location, recorded_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [user_id, pps_number, shipment_number, item, parseInt(quantity_variance), notes || null, req.user.id]
+      [user_id, pps_number, shipment_number, item, parseInt(quantity_variance), notes || null, picked_from_location || null, req.user.id]
     );
     console.log(`[PICK-ERRORS] Recorded error for user ${user_id} by supervisor ${req.user.id}`);
     res.json(result.rows[0]);
