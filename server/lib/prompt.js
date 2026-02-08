@@ -1,6 +1,27 @@
+function buildOverviewHint(chunks) {
+  // Extract distinct heading-like labels from chunk text (first line of each chunk)
+  const headings = chunks
+    .map(c => c.text.split('\n')[0].trim())
+    .filter(h => h.length > 2 && h.length < 80);
+
+  // Find unique headings (deduplicate similar ones)
+  const unique = [...new Set(headings)];
+  if (unique.length < 2) return '';
+
+  // Check if multiple chunks have distinctly different headings (different subtopics)
+  const distinct = unique.filter((h, i) =>
+    unique.every((other, j) => i === j || !other.startsWith(h) && !h.startsWith(other))
+  );
+
+  if (distinct.length >= 3) {
+    return `IMPORTANT: The context contains MULTIPLE distinct topics/methods: ${distinct.map(d => `"${d}"`).join(', ')}. Your answer MUST mention ALL of them — return one answer item per method/topic with a brief description of each. Do NOT just pick one and give steps for it.\n\n`;
+  }
+  return '';
+}
+
 function buildPrompt(question, chunks, goldenExample = null) {
   const context = chunks.map(c =>
-    `[${c.source_locator}]\n${c.text}`
+    `[${c.source_locator}] (relevance: ${((c.similarity || 0) * 100).toFixed(0)}%)\n${c.text}`
   ).join('\n\n---\n\n');
 
   const goldenSection = goldenExample ? `
@@ -15,12 +36,13 @@ Use this as a style and quality reference. Your answer MUST still be grounded ON
   return `You are a WMS (Warehouse Management System) SOP assistant for warehouse operators.
 ${goldenSection}CRITICAL RULES:
 1. Use ONLY the provided context chunks from SOPs
-2. If the answer is not in the context:
+2. Each chunk has a relevance % score. If ALL chunks have low relevance (below ~60%) and none actually address the question, the question is off-topic — respond with "Not found in SOPs"
+3. If the answer is not in the context:
    - Respond with: "Not found in SOPs"
    - Ask exactly ONE clarifying question to help retrieve better information
    - Also return 2-4 "suggestions" — contextual tips such as: related WMS terms the user could search for, which module filter might help, or how to rephrase using SOP terminology
-3. NO guessing, NO external knowledge, NO "best practices" unless SOP explicitly states it
-4. Every claim must include a citation to the source slide
+4. NO guessing, NO external knowledge, NO "best practices" unless SOP explicitly states it
+5. Every claim must include a citation to the source slide
 
 OUTPUT FORMAT:
 Return valid JSON with this exact structure:
@@ -49,7 +71,7 @@ SUGGESTIONS RULE:
 - For normal answers, set suggestions to null
 
 PROCEDURAL QUESTION RULE:
-- If the user asks "how", "steps", "process", or similar:
+- If the question is clearly about ONE specific procedure (e.g. "how do I pick by order"):
   - Return one discrete action per answer item
   - Keep each claim focused on a single step (do not combine multiple actions into one claim)
   - Preserve chronological order
@@ -59,7 +81,7 @@ IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanat
 Context:
 ${context}
 
-Question: ${question}`;
+${buildOverviewHint(chunks)}Question: ${question}`;
 }
 
 function buildOnboardingPrompt(step, chunks) {

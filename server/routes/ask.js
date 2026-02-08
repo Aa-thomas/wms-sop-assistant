@@ -1,10 +1,11 @@
 const express = require('express');
 const pgvector = require('pgvector/pg');
-const { retrieve, getPool } = require('../lib/retrieval');
+const { multiRetrieve, getPool } = require('../lib/retrieval');
 const { buildPrompt } = require('../lib/prompt');
 const { generate } = require('../lib/generate');
 const { findGoldenAnswer } = require('../lib/golden');
 const { normalizeStepwiseAnswer } = require('../lib/answer-format');
+const { expandQueries } = require('../lib/query-expand');
 
 const router = express.Router();
 
@@ -23,9 +24,29 @@ router.post('/ask', async (req, res) => {
   const start = Date.now();
 
   try {
-    // 1. Retrieve relevant chunks
-    const { chunks, queryEmbedding } = await retrieve(question, module || null);
+    // 1. Expand query into multiple search terms, then retrieve
+    const queries = await expandQueries(question);
+    console.log(`[ASK] Expanded to ${queries.length} queries (${Date.now() - start}ms)`);
+    const { chunks, queryEmbedding } = await multiRetrieve(queries, module || null);
     console.log(`[ASK] Retrieved ${chunks.length} chunks (${Date.now() - start}ms)`);
+
+    // 1b. If best similarity is too low, the question is off-topic — skip LLM
+    const MIN_SIMILARITY = 0.58;
+    if (chunks.length === 0 || chunks[0].similarity < MIN_SIMILARITY) {
+      console.log(`[ASK] Low relevance (best: ${chunks[0]?.similarity?.toFixed(3) || 'none'}) — returning not-found`);
+      return res.json({
+        answer: 'Not found in SOPs',
+        follow_up_question: 'Could you rephrase your question using WMS terminology?',
+        suggestions: [
+          'Try using specific WMS terms like "pick by order", "inbound order", or "cycle count"',
+          'Use the module filter to narrow your search (Picking, Outbound, Inbound, etc.)',
+          'Check the Onboarding section for guided walkthroughs of each module'
+        ],
+        coverage: { chunks_used: 0 },
+        sources: [],
+        interaction_id: null
+      });
+    }
 
     // 2. Check for golden answer
     let goldenExample = null;

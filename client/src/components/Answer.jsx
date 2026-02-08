@@ -48,11 +48,26 @@ export default function Answer({ data, interactionId, onFeedback }) {
     );
   }
 
-  // Handle array answer
+  // Handle empty/missing answer
   if (!Array.isArray(answer) || answer.length === 0) {
     return (
       <div className="answer">
-        <p className="not-found">No answer available. Please try rephrasing your question.</p>
+        <p className="not-found">Not found in SOPs. Try rephrasing your question.</p>
+        {follow_up_question && (
+          <div className="follow-up">
+            <strong>Suggestion:</strong> {follow_up_question}
+          </div>
+        )}
+        {suggestions && suggestions.length > 0 && (
+          <div className="suggestions">
+            <strong>Try these tips:</strong>
+            <ul>
+              {suggestions.map((tip, i) => (
+                <li key={i}>{tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
       </div>
     );
