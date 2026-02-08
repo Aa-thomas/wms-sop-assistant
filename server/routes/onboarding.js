@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../lib/db');
-const { buildQuizValidationPrompt } = require('../lib/prompt');
-const { generate } = require('../lib/generate');
 const { supervisorMiddleware } = require('../lib/auth');
 
 /**
@@ -119,6 +117,7 @@ router.post('/step', async (req, res) => {
       total_steps: step.total_steps,
       completed_count: step.completed_count,
       checkpoint: step.checkpoint_question,
+      checkpoint_options: step.checkpoint_options,
       chunks
     });
 
@@ -271,15 +270,15 @@ router.get('/available', async (req, res) => {
  */
 router.post('/validate-answer', async (req, res) => {
   const user_id = req.user.id.toString();
-  const { module, step_number, user_answer } = req.body;
+  const { module, step_number, selected_option } = req.body;
 
-  if (!module || !step_number || !user_answer) {
-    return res.status(400).json({ error: 'module, step_number, and user_answer required' });
+  if (!module || !step_number || selected_option == null) {
+    return res.status(400).json({ error: 'module, step_number, and selected_option required' });
   }
 
   try {
     const stepResult = await db.query(
-      `SELECT checkpoint_question, chunk_ids
+      `SELECT checkpoint_question, checkpoint_options, correct_option_index
        FROM onboarding_curriculum
        WHERE module = $1 AND step_number = $2`,
       [module, step_number]
@@ -290,22 +289,10 @@ router.post('/validate-answer', async (req, res) => {
     }
 
     const step = stepResult.rows[0];
-
-    // Fetch chunks directly by IDs for quiz context
-    const chunksResult = await db.query(
-      `SELECT id, text, doc_title, slide_number, source_locator
-       FROM chunks WHERE id = ANY($1)
-       ORDER BY array_position($1, id)`,
-      [step.chunk_ids]
-    );
-
-    const prompt = buildQuizValidationPrompt(
-      step.checkpoint_question,
-      user_answer,
-      chunksResult.rows
-    );
-
-    const validation = await generate(prompt);
+    const is_correct = selected_option === step.correct_option_index;
+    const feedback = is_correct
+      ? 'Correct!'
+      : `Not quite. The correct answer is: ${step.checkpoint_options[step.correct_option_index]}`;
 
     // Count previous attempts
     const attemptsResult = await db.query(
@@ -317,20 +304,21 @@ router.post('/validate-answer', async (req, res) => {
 
     const attemptNumber = parseInt(attemptsResult.rows[0].count) + 1;
 
-    // Store attempt
+    // Store attempt (selected option index as string in user_answer)
     await db.query(
       `INSERT INTO onboarding_quiz_attempts
        (user_id, module, step_number, question, user_answer, is_correct, feedback, attempt_number)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [user_id, module, step_number, step.checkpoint_question, user_answer,
-       validation.is_correct, validation.feedback, attemptNumber]
+      [user_id, module, step_number, step.checkpoint_question,
+       String(selected_option), is_correct, feedback, attemptNumber]
     );
 
-    const canProceed = validation.is_correct || attemptNumber >= 3;
+    const canProceed = is_correct || attemptNumber >= 3;
 
     return res.json({
-      is_correct: validation.is_correct,
-      feedback: validation.feedback,
+      is_correct,
+      feedback,
+      correct_option_index: step.correct_option_index,
       can_proceed: canProceed,
       attempts: attemptNumber,
       max_attempts: 3

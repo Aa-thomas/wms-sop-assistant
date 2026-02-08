@@ -17,7 +17,7 @@ const STARTER_PROMPTS = [
   { icon: '📦', title: 'Inbound Orders', question: 'How do I process an inbound order?', module: 'Inbound' },
   { icon: '🔄', title: 'Cycle Counting', question: 'What are the steps for cycle counting?', module: 'CycleCounts' },
   { icon: '↩️', title: 'Returns', question: 'How do I handle customer returns?', module: 'Returns' },
-  { icon: '🎯', title: 'Pick Process', question: "What's the pick process at a PPS station?", module: 'Picking' },
+  { icon: '🎯', title: 'Pick Process', question: "What is the picking process?", module: 'Picking' },
 ];
 
 function authFetch(url, options = {}) {

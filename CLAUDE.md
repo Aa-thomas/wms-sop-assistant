@@ -83,7 +83,7 @@ Every chunk MUST have:
 - `text` (slide title + bullets)
 - `embedding` (vector[1536])
 - `doc_title` (original PPTX filename without extension)
-- `module` (one of: Navigation, Inbound, Outbound, Picking, Replenishment, Inventory, CycleCounts, Returns, Admin)
+- `module` (one of: Navigation, Inbound, Outbound, Picking, Waves, Replenishment, Inventory, CycleCounts, Operations, Returns, Admin)
 - `slide_number` (integer)
 - `source_locator` (human-readable: "{doc_title} - Slide {number}")
 

@@ -10,9 +10,11 @@ const ALL_MODULES = [
   { value: 'Inbound', label: 'Inbound' },
   { value: 'Outbound', label: 'Outbound' },
   { value: 'Picking', label: 'Picking' },
+  { value: 'Waves', label: 'Waves' },
   { value: 'Replenishment', label: 'Replenishment' },
   { value: 'Inventory', label: 'Inventory' },
   { value: 'CycleCounts', label: 'Cycle Counts' },
+  { value: 'Operations', label: 'Operations' },
   { value: 'Returns', label: 'Returns' },
   { value: 'Admin', label: 'Admin' }
 ];
