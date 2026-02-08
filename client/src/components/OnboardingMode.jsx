@@ -11,7 +11,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
   const [modulesLoading, setModulesLoading] = useState(true);
   const [selectedModule, setSelectedModule] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [currentExplanation, setCurrentExplanation] = useState(null);
+  const [stepData, setStepData] = useState(null);
   const [showCheckpoint, setShowCheckpoint] = useState(false);
   const [userAnswer, setUserAnswer] = useState('');
   const [quizResult, setQuizResult] = useState(null);
@@ -23,21 +23,6 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
 
   function toggle(key) {
     setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
-  }
-
-  function findSource(docTitle, slideNumber) {
-    if (!currentExplanation?.sources) return null;
-    // Exact match first
-    const exact = currentExplanation.sources.find(
-      s => s.doc_title === docTitle && s.slide_number === slideNumber
-    );
-    if (exact) return exact;
-    // Fallback: match by slide number + partial doc_title (Claude may use full PPTX title vs short module name)
-    return currentExplanation.sources.find(
-      s => s.slide_number === slideNumber &&
-        (docTitle.toLowerCase().includes(s.doc_title.toLowerCase()) ||
-         s.doc_title.toLowerCase().includes(docTitle.toLowerCase()))
-    ) || null;
   }
 
   // Load available modules on mount
@@ -97,7 +82,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
       });
 
       const data = await res.json();
-      setCurrentExplanation(data);
+      setStepData(data);
       setShowCheckpoint(false);
       setUserAnswer('');
       setQuizResult(null);
@@ -120,7 +105,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
         method: 'POST',
         body: JSON.stringify({
           module: selectedModule,
-          step_number: step.step_number,
+          step_number: stepData?.step_number || step.step_number,
           user_answer: userAnswer
         })
       });
@@ -143,7 +128,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
         method: 'POST',
         body: JSON.stringify({
           module: selectedModule,
-          step_number: step.step_number
+          step_number: stepData?.step_number || step.step_number
         })
       });
 
@@ -236,10 +221,10 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
         </div>
         <div className="progress-bar">
           <div className="step-indicator">
-            Step {step?.step_number} of {step?.total_steps}
+            Step {stepData?.step_number || step?.step_number} of {stepData?.total_steps || step?.total_steps}
           </div>
           <div className="progress-fill" style={{
-            width: `${(step?.completed_count / step?.total_steps) * 100}%`
+            width: `${((stepData?.completed_count ?? step?.completed_count) / (stepData?.total_steps ?? step?.total_steps)) * 100}%`
           }} />
         </div>
       </div>
@@ -248,72 +233,59 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
       <div className="step-content">
         {loading ? (
           <SkeletonStep />
-        ) : currentExplanation ? (
+        ) : stepData?.chunks ? (
           <>
-            <h2>{step?.step_title}</h2>
-            <p className="step-description">{step?.step_description}</p>
+            <h2>{stepData.step_title}</h2>
+            <p className="step-description">{stepData.step_description}</p>
 
-            {/* Explanation */}
-            <div className="explanation">
-              <div dangerouslySetInnerHTML={{
-                __html: formatExplanation(currentExplanation.explanation)
-              }} />
-            </div>
-
-            {/* Quick Tip */}
-            {currentExplanation.quick_tip && (
-              <div className="quick-tip">
-                <strong>Quick Tip:</strong> {currentExplanation.quick_tip}
-              </div>
-            )}
-
-            {/* Common Mistake */}
-            {currentExplanation.common_mistake && (
-              <div className="common-mistake">
-                <strong>Common Mistake:</strong> {currentExplanation.common_mistake}
-              </div>
-            )}
-
-            {/* Citations */}
-            <div className="onboarding-citations">
-              <strong>Source SOPs:</strong>
-              {currentExplanation.citations?.map((cite, idx) => {
-                const source = findSource(cite.doc_title, cite.slide_number);
-                const isExpanded = expanded[`cite-${idx}`];
+            {/* SOP Slides as Step Boxes */}
+            <ol className="step-list">
+              {stepData.chunks.map((chunk, i) => {
+                const isExpanded = !!expanded[`chunk-${i}`];
                 return (
-                  <div key={idx} className={`onboarding-cite-item ${isExpanded ? 'expanded' : ''} ${source ? 'has-slide' : ''}`}>
-                    <button
-                      className="cite-header"
-                      onClick={() => source && toggle(`cite-${idx}`)}
-                      type="button"
-                    >
-                      <span className="cite-label">
-                        {cite.doc_title} - {cite.source_locator}
-                        {cite.relevance && <span className="relevance"> — {cite.relevance}</span>}
-                      </span>
-                      {source && (
-                        <svg className="cite-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <li
+                    key={chunk.id}
+                    className={`step-item has-slide ${isExpanded ? 'expanded' : ''}`}
+                    onClick={() => toggle(`chunk-${i}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle(`chunk-${i}`);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="step-head">
+                      <div className="step-index">{i + 1}</div>
+                      <div className="step-body">
+                        <div className="step-claim">{chunk.source_locator}</div>
+                      </div>
+                      <div className="step-chevron" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                           <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                      )}
-                    </button>
-                    {isExpanded && source && (
-                      <div className="cite-slide-panel">
-                        {source.image_url && !missingImages[source.image_url] && (
-                          <img
-                            src={source.image_url}
-                            alt={`${cite.doc_title} - Slide ${cite.slide_number}`}
-                            className="slide-image"
-                            onError={() => setMissingImages(prev => ({ ...prev, [source.image_url]: true }))}
-                          />
-                        )}
-                        <pre className="slide-text">{source.text}</pre>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="step-slide-panel">
+                        <div className="slide-content">
+                          {chunk.image_url && !missingImages[chunk.image_url] && (
+                            <img
+                              src={chunk.image_url}
+                              alt={chunk.source_locator}
+                              className="slide-image"
+                              onError={() => setMissingImages(prev => ({ ...prev, [chunk.image_url]: true }))}
+                            />
+                          )}
+                          <pre>{chunk.text}</pre>
+                        </div>
                       </div>
                     )}
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ol>
 
             {/* Checkpoint */}
             {!showCheckpoint ? (
@@ -321,7 +293,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
                 onClick={() => setShowCheckpoint(true)}
                 className="checkpoint-btn"
               >
-                I understand this step
+                I've reviewed these slides
               </button>
             ) : quizResult ? (
               <div className={`quiz-feedback ${quizResult.is_correct ? 'correct' : 'incorrect'}`}>
@@ -365,7 +337,7 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
             ) : (
               <div className="checkpoint">
                 <h3>Knowledge Check:</h3>
-                <p>{step?.checkpoint_question}</p>
+                <p>{stepData.checkpoint}</p>
 
                 <textarea
                   value={userAnswer}
@@ -393,12 +365,3 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
   );
 }
 
-// Helper: Format explanation text (convert markdown-style to HTML)
-function formatExplanation(text) {
-  if (!text) return '';
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(.+)$/gm, '<p>$1</p>')
-    .replace(/(<p><\/p>)/g, '');
-}

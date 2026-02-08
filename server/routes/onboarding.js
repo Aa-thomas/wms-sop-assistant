@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../lib/db');
-const { retrieve } = require('../lib/retrieval');
-const { buildOnboardingPrompt, buildQuizValidationPrompt } = require('../lib/prompt');
+const { buildQuizValidationPrompt } = require('../lib/prompt');
 const { generate } = require('../lib/generate');
 const { supervisorMiddleware } = require('../lib/auth');
 
@@ -96,39 +95,31 @@ router.post('/step', async (req, res) => {
 
     const step = stepResult.rows[0];
 
-    const allChunks = [];
-    for (const query of step.search_queries) {
-      const { chunks } = await retrieve(query, module);
-      allChunks.push(...chunks);
-    }
+    // Fetch chunks directly by IDs — deterministic, no vector search
+    const chunksResult = await db.query(
+      `SELECT id, text, doc_title, slide_number, source_locator
+       FROM chunks WHERE id = ANY($1)
+       ORDER BY array_position($1, id)`,
+      [step.chunk_ids]
+    );
 
-    const uniqueChunks = Array.from(
-      new Map(allChunks.map(c => [c.id, c])).values()
-    ).slice(0, 10);
-
-    const prompt = buildOnboardingPrompt(step, uniqueChunks);
-    const response = await generate(prompt);
-
-    const sources = uniqueChunks.map(c => ({
+    const chunks = chunksResult.rows.map(c => ({
+      id: c.id,
+      text: c.text,
       doc_title: c.doc_title,
       slide_number: c.slide_number,
       source_locator: c.source_locator,
-      text: c.text,
       image_url: `/images/${c.doc_title.replace(/\s+/g, '_')}/slide_${c.slide_number}.png`
     }));
 
     return res.json({
       step_number: step.step_number,
       step_title: step.step_title,
+      step_description: step.step_description,
       total_steps: step.total_steps,
       completed_count: step.completed_count,
-      explanation: response.explanation,
-      quick_tip: response.quick_tip,
-      common_mistake: response.common_mistake,
       checkpoint: step.checkpoint_question,
-      citations: response.citations,
-      sources,
-      next_action: 'complete_checkpoint'
+      chunks
     });
 
   } catch (error) {
@@ -288,7 +279,7 @@ router.post('/validate-answer', async (req, res) => {
 
   try {
     const stepResult = await db.query(
-      `SELECT checkpoint_question, search_queries
+      `SELECT checkpoint_question, chunk_ids
        FROM onboarding_curriculum
        WHERE module = $1 AND step_number = $2`,
       [module, step_number]
@@ -300,21 +291,18 @@ router.post('/validate-answer', async (req, res) => {
 
     const step = stepResult.rows[0];
 
-    // Retrieve relevant chunks for context
-    const allChunks = [];
-    for (const query of step.search_queries) {
-      const { chunks } = await retrieve(query, module);
-      allChunks.push(...chunks);
-    }
-
-    const uniqueChunks = Array.from(
-      new Map(allChunks.map(c => [c.id, c])).values()
-    ).slice(0, 5);
+    // Fetch chunks directly by IDs for quiz context
+    const chunksResult = await db.query(
+      `SELECT id, text, doc_title, slide_number, source_locator
+       FROM chunks WHERE id = ANY($1)
+       ORDER BY array_position($1, id)`,
+      [step.chunk_ids]
+    );
 
     const prompt = buildQuizValidationPrompt(
       step.checkpoint_question,
       user_answer,
-      uniqueChunks
+      chunksResult.rows
     );
 
     const validation = await generate(prompt);
