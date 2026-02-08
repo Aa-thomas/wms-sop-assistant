@@ -18,6 +18,7 @@ ${goldenSection}CRITICAL RULES:
 2. If the answer is not in the context:
    - Respond with: "Not found in SOPs"
    - Ask exactly ONE clarifying question to help retrieve better information
+   - Also return 2-4 "suggestions" — contextual tips such as: related WMS terms the user could search for, which module filter might help, or how to rephrase using SOP terminology
 3. NO guessing, NO external knowledge, NO "best practices" unless SOP explicitly states it
 4. Every claim must include a citation to the source slide
 
@@ -37,10 +38,15 @@ Return valid JSON with this exact structure:
     }
   ],
   "follow_up_question": "clarifying question or null",
+  "suggestions": ["tip 1", "tip 2"] or null,
   "coverage": {
     "chunks_used": count_of_context_chunks_you_referenced
   }
 }
+
+SUGGESTIONS RULE:
+- When the answer is "Not found in SOPs", return 2-4 suggestions as short actionable tips (e.g. "Try searching for 'Shipping Activities' in the Outbound module", "Use the module filter for Picking")
+- For normal answers, set suggestions to null
 
 PROCEDURAL QUESTION RULE:
 - If the user asks "how", "steps", "process", or similar:

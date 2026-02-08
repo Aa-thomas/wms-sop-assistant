@@ -8,7 +8,7 @@ export default function Answer({ data, interactionId, onFeedback }) {
 
   if (!data) return null;
 
-  const { answer, follow_up_question, sources } = data;
+  const { answer, follow_up_question, suggestions, sources } = data;
 
   function toggle(key) {
     setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
@@ -33,6 +33,16 @@ export default function Answer({ data, interactionId, onFeedback }) {
             <strong>Suggestion:</strong> {follow_up_question}
           </div>
         )}
+        {suggestions && suggestions.length > 0 && (
+          <div className="suggestions">
+            <strong>Try these tips:</strong>
+            <ul>
+              {suggestions.map((tip, i) => (
+                <li key={i}>{tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
       </div>
     );
@@ -43,6 +53,7 @@ export default function Answer({ data, interactionId, onFeedback }) {
     return (
       <div className="answer">
         <p className="not-found">No answer available. Please try rephrasing your question.</p>
+        <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
       </div>
     );
   }
