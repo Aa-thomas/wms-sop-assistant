@@ -18,7 +18,7 @@ WITH user_modules AS (
     MAX(p.last_activity) AS last_activity
   FROM users u
   LEFT JOIN onboarding_progress p ON u.id::TEXT = p.user_id
-  WHERE u.is_supervisor = false
+  WHERE u.is_active = true
   GROUP BY u.id, u.username
 ),
 user_quiz AS (
@@ -111,7 +111,7 @@ SELECT
 FROM users u
 CROSS JOIN (SELECT DISTINCT module FROM onboarding_curriculum) c
 LEFT JOIN onboarding_progress p ON u.id::TEXT = p.user_id AND c.module = p.module
-WHERE u.is_supervisor = false
+WHERE u.is_active = true
   AND p.id IS NULL;
 
 -- 1d. Function: get_team_strength_overview() — team-level summary
@@ -145,7 +145,7 @@ BEGIN
     FROM (SELECT DISTINCT module FROM onboarding_curriculum) c
     CROSS JOIN users u
     LEFT JOIN onboarding_progress p ON u.id::TEXT = p.user_id AND c.module = p.module
-    WHERE u.is_supervisor = false
+    WHERE u.is_active = true
     GROUP BY c.module
     ORDER BY COUNT(DISTINCT CASE WHEN p.completed_at IS NOT NULL THEN p.user_id END)::FLOAT /
              NULLIF(COUNT(DISTINCT u.id), 0) ASC
