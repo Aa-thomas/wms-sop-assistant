@@ -6,12 +6,27 @@ export default function SearchBar({ onSubmit, loading, authFetch }) {
   const [modules, setModules] = useState([]);
 
   useEffect(() => {
-    if (authFetch) {
-      authFetch('/modules/available')
-        .then(res => res.json())
-        .then(data => setModules(data))
-        .catch(err => console.error('Failed to load modules:', err));
-    }
+    if (!authFetch) return;
+
+    // Check sessionStorage cache (1-hour TTL)
+    try {
+      const cached = sessionStorage.getItem('modules_available');
+      if (cached) {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 60 * 60 * 1000) {
+          setModules(data);
+          return;
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
+    authFetch('/modules/available')
+      .then(res => res.json())
+      .then(data => {
+        setModules(data);
+        sessionStorage.setItem('modules_available', JSON.stringify({ data, ts: Date.now() }));
+      })
+      .catch(err => console.error('Failed to load modules:', err));
   }, [authFetch]);
 
   function handleSubmit(e) {

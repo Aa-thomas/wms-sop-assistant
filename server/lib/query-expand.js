@@ -2,7 +2,31 @@ const OpenAI = require('openai');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// In-memory cache with 30-minute TTL
+const expandCache = new Map();
+const EXPAND_TTL = 30 * 60 * 1000;
+
+function getCachedExpand(key) {
+  const entry = expandCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > EXPAND_TTL) {
+    expandCache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function setCacheExpand(key, value) {
+  expandCache.set(key, { value, ts: Date.now() });
+}
+
 async function expandQueries(question) {
+  const cacheKey = question.trim().toLowerCase();
+  const cached = getCachedExpand(cacheKey);
+  if (cached) {
+    console.log(`[EXPAND-CACHE] HIT for "${question}"`);
+    return cached;
+  }
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -43,7 +67,9 @@ Question: "${question}"`
     const queries = JSON.parse(text);
     if (Array.isArray(queries) && queries.length > 0) {
       console.log(`[EXPAND] "${question}" → ${queries.length} queries:`, queries);
-      return queries.slice(0, 5);
+      const result = queries.slice(0, 5);
+      setCacheExpand(cacheKey, result);
+      return result;
     }
   } catch (err) {
     console.error('[EXPAND] Failed, falling back to original question:', err.message);
