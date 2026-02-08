@@ -3,7 +3,7 @@ import { useToast } from '../contexts/ToastContext';
 import { SkeletonStep, SkeletonModuleCard } from './Skeleton';
 import './OnboardingMode.css';
 
-export default function OnboardingMode({ userId, onExit }) {
+export default function OnboardingMode({ userId, onExit, authFetch }) {
   const [step, setStep] = useState(null);
   const [modules, setModules] = useState([]);
   const [modulesLoading, setModulesLoading] = useState(true);
@@ -19,7 +19,7 @@ export default function OnboardingMode({ userId, onExit }) {
 
   // Load available modules on mount
   useEffect(() => {
-    fetch('/onboarding/available')
+    authFetch('/onboarding/available')
       .then(res => res.json())
       .then(data => setModules(data))
       .catch(err => {
@@ -33,10 +33,9 @@ export default function OnboardingMode({ userId, onExit }) {
   const startOnboarding = async (module) => {
     setLoading(true);
     try {
-      const res = await fetch('/onboarding/start', {
+      const res = await authFetch('/onboarding/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, module })
+        body: JSON.stringify({ module })
       });
 
       const data = await res.json();
@@ -62,10 +61,9 @@ export default function OnboardingMode({ userId, onExit }) {
   const loadStepContent = async (module) => {
     setLoading(true);
     try {
-      const res = await fetch('/onboarding/step', {
+      const res = await authFetch('/onboarding/step', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, module })
+        body: JSON.stringify({ module })
       });
 
       const data = await res.json();
@@ -86,11 +84,9 @@ export default function OnboardingMode({ userId, onExit }) {
   const submitAnswer = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch('/onboarding/validate-answer', {
+      const res = await authFetch('/onboarding/validate-answer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
           module: selectedModule,
           step_number: step.step_number,
           user_answer: userAnswer
@@ -111,11 +107,9 @@ export default function OnboardingMode({ userId, onExit }) {
   const completeStep = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/onboarding/complete-step', {
+      const res = await authFetch('/onboarding/complete-step', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
           module: selectedModule,
           step_number: step.step_number
         })

@@ -5,7 +5,7 @@ import './GapAnalysis.css';
 
 const SEVERITY_ORDER = { high: 1, medium: 2, low: 3 };
 
-export default function GapAnalysis() {
+export default function GapAnalysis({ authFetch }) {
   const [report, setReport] = useState({ run: null, gaps: [] });
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
@@ -19,7 +19,7 @@ export default function GapAnalysis() {
 
   const loadReport = async () => {
     try {
-      const res = await fetch('/gaps/report');
+      const res = await authFetch('/gaps/report');
       const data = await res.json();
       setReport(data);
     } catch (error) {
@@ -33,9 +33,8 @@ export default function GapAnalysis() {
   const runAnalysis = async () => {
     setAnalyzing(true);
     try {
-      const res = await fetch('/gaps/analyze', {
+      const res = await authFetch('/gaps/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ period_days: 30 })
       });
       if (!res.ok) throw new Error('Analysis failed');
@@ -52,9 +51,8 @@ export default function GapAnalysis() {
 
   const updateGapStatus = async (gapId, status) => {
     try {
-      const res = await fetch(`/gaps/${gapId}`, {
+      const res = await authFetch(`/gaps/${gapId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
       if (!res.ok) throw new Error('Update failed');
@@ -73,7 +71,7 @@ export default function GapAnalysis() {
 
   const generateDraft = async (gapId) => {
     try {
-      const res = await fetch(`/gaps/${gapId}/draft`, {
+      const res = await authFetch(`/gaps/${gapId}/draft`, {
         method: 'POST'
       });
       if (!res.ok) throw new Error('Draft generation failed');
