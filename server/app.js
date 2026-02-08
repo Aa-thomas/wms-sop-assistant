@@ -7,6 +7,7 @@ const authRouter = require('./routes/auth');
 const onboardingRouter = require('./routes/onboarding');
 const gapsRouter = require('./routes/gaps');
 const pickErrorsRouter = require('./routes/pick-errors');
+const usersRouter = require('./routes/users');
 const { authMiddleware, supervisorMiddleware } = require('./lib/auth');
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/onboarding', authMiddleware, onboardingRouter);
 // Supervisor-only routes
 app.use('/gaps', supervisorMiddleware, gapsRouter);
 app.use('/pick-errors', supervisorMiddleware, pickErrorsRouter);
+app.use('/users', supervisorMiddleware, usersRouter);
 
 // In production, serve the React build and handle client-side routing
 if (process.env.NODE_ENV === 'production') {

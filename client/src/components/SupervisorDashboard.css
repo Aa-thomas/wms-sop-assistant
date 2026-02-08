@@ -357,6 +357,76 @@
   color: var(--text-secondary);
 }
 
+/* User Management */
+.user-management {
+  margin-top: var(--space-4);
+}
+
+.role-badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.role-badge.supervisor {
+  background: var(--status-info-bg);
+  color: var(--status-info);
+}
+
+.role-badge.operator {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.you-badge {
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+}
+
+.role-toggle-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.role-toggle-btn.promote {
+  background: transparent;
+  color: var(--status-info);
+  border-color: var(--status-info);
+}
+
+.role-toggle-btn.promote:hover:not(:disabled) {
+  background: var(--status-info);
+  color: white;
+}
+
+.role-toggle-btn.demote {
+  background: transparent;
+  color: var(--status-warning);
+  border-color: var(--status-warning);
+}
+
+.role-toggle-btn.demote:hover:not(:disabled) {
+  background: var(--status-warning);
+  color: white;
+}
+
+.role-toggle-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .supervisor-dashboard {

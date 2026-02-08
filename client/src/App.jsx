@@ -148,7 +148,7 @@ function App() {
   if (mode === 'supervisor') {
     return (
       <div className="app" style={{ maxWidth: '1400px' }}>
-        <SupervisorDashboard onExit={() => setMode('chat')} authFetch={authedFetch} />
+        <SupervisorDashboard onExit={() => setMode('chat')} authFetch={authedFetch} currentUserId={currentUser.id} />
       </div>
     );
   }

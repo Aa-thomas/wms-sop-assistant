@@ -13,7 +13,8 @@ export default defineConfig({
       '/images': 'http://localhost:3000',
       '/onboarding': 'http://localhost:3000',
       '/gaps': 'http://localhost:3000',
-      '/pick-errors': 'http://localhost:3000'
+      '/pick-errors': 'http://localhost:3000',
+      '/users': 'http://localhost:3000'
     }
   }
 })
