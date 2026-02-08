@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import './PersonalHealth.css';
 
-export default function PersonalHealth({ authFetch }) {
+export default function PersonalHealth({ authFetch, onStartOnboarding }) {
   const [health, setHealth] = useState(null);
   const [weaknesses, setWeaknesses] = useState([]);
+  const [onboardingProgress, setOnboardingProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -15,16 +16,19 @@ export default function PersonalHealth({ authFetch }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [healthRes, weaknessRes] = await Promise.all([
+      const [healthRes, weaknessRes, onboardingRes] = await Promise.all([
         authFetch('/operator/health'),
-        authFetch('/operator/weaknesses')
+        authFetch('/operator/weaknesses'),
+        authFetch('/operator/onboarding')
       ]);
-      const [healthData, weaknessData] = await Promise.all([
+      const [healthData, weaknessData, onboardingData] = await Promise.all([
         healthRes.json(),
-        weaknessRes.json()
+        weaknessRes.json(),
+        onboardingRes.json()
       ]);
       setHealth(healthData);
       setWeaknesses(weaknessData);
+      setOnboardingProgress(Array.isArray(onboardingData) ? onboardingData : []);
     } catch (error) {
       console.error('Failed to load health data:', error);
       showToast('error', 'Failed to load health data.');
@@ -201,14 +205,35 @@ export default function PersonalHealth({ authFetch }) {
         </div>
       )}
 
-      {/* Not Started Modules */}
-      {notStarted.length > 0 && (
+      {/* Available Modules */}
+      {(notStarted.length > 0 || onboardingProgress.length > 0) && (
         <div className="not-started-section">
           <h3>📚 Available Modules</h3>
-          <p className="section-description">These modules are available for you to start:</p>
+          <p className="section-description">Click a module to start or continue training:</p>
           <div className="module-tags">
+            {/* Modules with progress */}
+            {onboardingProgress.map(p => (
+              <button
+                key={p.module}
+                className={`module-tag module-tag--${p.status}`}
+                onClick={() => onStartOnboarding(p.module)}
+              >
+                {p.status === 'completed' && <span className="module-tag-check">&#10003;</span>}
+                {p.module}
+                {p.status !== 'completed' && (
+                  <span className="module-tag-progress">{Number(p.completed_count || 0)}/{Number(p.total_steps || 0)}</span>
+                )}
+              </button>
+            ))}
+            {/* Not started modules */}
             {notStarted.map((w, i) => (
-              <span key={i} className="module-tag">{w.module}</span>
+              <button
+                key={i}
+                className="module-tag module-tag--not_started"
+                onClick={() => onStartOnboarding(w.module)}
+              >
+                {w.module}
+              </button>
             ))}
           </div>
         </div>

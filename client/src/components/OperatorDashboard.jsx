@@ -48,7 +48,7 @@ export default function OperatorDashboard({ onExit, onStartOnboarding, authFetch
       </div>
 
       {activeTab === 'briefing' && <PersonalBriefing authFetch={authFetch} onNavigateTab={setActiveTab} />}
-      {activeTab === 'health' && <PersonalHealth authFetch={authFetch} />}
+      {activeTab === 'health' && <PersonalHealth authFetch={authFetch} onStartOnboarding={onStartOnboarding} />}
       {activeTab === 'training' && <PersonalTraining authFetch={authFetch} onStartOnboarding={onStartOnboarding} />}
       {activeTab === 'errors' && <PersonalErrors authFetch={authFetch} />}
 

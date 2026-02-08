@@ -171,10 +171,54 @@
 }
 
 .module-tag {
-  background: var(--bg-subtle);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   border-radius: var(--radius-full);
-  padding: 2px var(--space-3);
+  padding: var(--space-1) var(--space-3);
   font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.module-tag:hover {
+  filter: brightness(0.9);
+  transform: translateY(-1px);
+}
+
+.module-tag:active {
+  transform: translateY(0);
+}
+
+/* Not started — green */
+.module-tag--not_started {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Active / In Progress — yellow */
+.module-tag--active,
+.module-tag--stalled {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Completed — grey with checkmark */
+.module-tag--completed {
+  background: #e2e3e5;
+  color: #6c757d;
+}
+
+.module-tag-check {
+  font-weight: 700;
+}
+
+.module-tag-progress {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 .all-good-section {

@@ -160,13 +160,15 @@ function App() {
     setTourCompletedPages(prev => new Set(prev).add(pageKey));
   }
 
-  if (mode === 'onboarding') {
+  if (mode === 'onboarding' || (typeof mode === 'object' && mode?.type === 'onboarding')) {
+    const initialModule = typeof mode === 'object' ? mode.module : null;
     return (
       <div className="app">
         <OnboardingMode
           userId={currentUser.id.toString()}
           onExit={() => setMode('chat')}
           authFetch={authedFetch}
+          initialModule={initialModule}
           tourActive={tourActive && !tourCompletedPages.has('onboarding')}
           onTourEnd={handleTourEnd}
           onPageComplete={() => handlePageComplete('onboarding')}
@@ -188,7 +190,7 @@ function App() {
       <div className="app" style={{ maxWidth: '1400px' }}>
         <OperatorDashboard
           onExit={() => setMode('chat')}
-          onStartOnboarding={() => setMode('onboarding')}
+          onStartOnboarding={(module) => module ? setMode({ type: 'onboarding', module }) : setMode('onboarding')}
           authFetch={authedFetch}
           currentUser={currentUser}
           tourActive={tourActive && !tourCompletedPages.has('operator')}

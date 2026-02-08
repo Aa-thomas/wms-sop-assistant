@@ -5,7 +5,7 @@ import PageTooltips from './PageTooltips';
 import { ONBOARDING_TOOLTIPS } from '../lib/tourConfig';
 import './OnboardingMode.css';
 
-export default function OnboardingMode({ userId, onExit, authFetch, tourActive, onTourEnd, onPageComplete }) {
+export default function OnboardingMode({ userId, onExit, authFetch, initialModule, tourActive, onTourEnd, onPageComplete }) {
   const [step, setStep] = useState(null);
   const [modules, setModules] = useState([]);
   const [modulesLoading, setModulesLoading] = useState(true);
@@ -30,6 +30,13 @@ export default function OnboardingMode({ userId, onExit, authFetch, tourActive, 
       })
       .finally(() => setModulesLoading(false));
   }, []);
+
+  // Auto-start module if initialModule is provided
+  useEffect(() => {
+    if (initialModule && !modulesLoading && modules.length > 0 && !selectedModule) {
+      startOnboarding(initialModule);
+    }
+  }, [initialModule, modulesLoading, modules]);
 
   // Start onboarding for selected module
   const startOnboarding = async (module) => {
