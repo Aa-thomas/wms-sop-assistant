@@ -109,6 +109,14 @@ router.post('/step', async (req, res) => {
     const prompt = buildOnboardingPrompt(step, uniqueChunks);
     const response = await generate(prompt);
 
+    const sources = uniqueChunks.map(c => ({
+      doc_title: c.doc_title,
+      slide_number: c.slide_number,
+      source_locator: c.source_locator,
+      text: c.text,
+      image_url: `/images/${c.doc_title.replace(/\s+/g, '_')}/slide_${c.slide_number}.png`
+    }));
+
     return res.json({
       step_number: step.step_number,
       step_title: step.step_title,
@@ -119,6 +127,7 @@ router.post('/step', async (req, res) => {
       common_mistake: response.common_mistake,
       checkpoint: step.checkpoint_question,
       citations: response.citations,
+      sources,
       next_action: 'complete_checkpoint'
     });
 

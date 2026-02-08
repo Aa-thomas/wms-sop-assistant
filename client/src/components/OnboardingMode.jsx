@@ -17,7 +17,28 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
   const [quizResult, setQuizResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [completionMessage, setCompletionMessage] = useState(null);
+  const [expanded, setExpanded] = useState({});
+  const [missingImages, setMissingImages] = useState({});
   const { showToast } = useToast();
+
+  function toggle(key) {
+    setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function findSource(docTitle, slideNumber) {
+    if (!currentExplanation?.sources) return null;
+    // Exact match first
+    const exact = currentExplanation.sources.find(
+      s => s.doc_title === docTitle && s.slide_number === slideNumber
+    );
+    if (exact) return exact;
+    // Fallback: match by slide number + partial doc_title (Claude may use full PPTX title vs short module name)
+    return currentExplanation.sources.find(
+      s => s.slide_number === slideNumber &&
+        (docTitle.toLowerCase().includes(s.doc_title.toLowerCase()) ||
+         s.doc_title.toLowerCase().includes(docTitle.toLowerCase()))
+    ) || null;
+  }
 
   // Load available modules on mount
   useEffect(() => {
@@ -80,6 +101,8 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
       setShowCheckpoint(false);
       setUserAnswer('');
       setQuizResult(null);
+      setExpanded({});
+      setMissingImages({});
 
     } catch (error) {
       console.error('Failed to load step:', error);
@@ -254,14 +277,42 @@ export default function OnboardingMode({ userId, onExit, authFetch, initialModul
             {/* Citations */}
             <div className="onboarding-citations">
               <strong>Source SOPs:</strong>
-              <ul>
-                {currentExplanation.citations?.map((cite, idx) => (
-                  <li key={idx}>
-                    {cite.doc_title} - {cite.source_locator}
-                    {cite.relevance && <span className="relevance"> - {cite.relevance}</span>}
-                  </li>
-                ))}
-              </ul>
+              {currentExplanation.citations?.map((cite, idx) => {
+                const source = findSource(cite.doc_title, cite.slide_number);
+                const isExpanded = expanded[`cite-${idx}`];
+                return (
+                  <div key={idx} className={`onboarding-cite-item ${isExpanded ? 'expanded' : ''} ${source ? 'has-slide' : ''}`}>
+                    <button
+                      className="cite-header"
+                      onClick={() => source && toggle(`cite-${idx}`)}
+                      type="button"
+                    >
+                      <span className="cite-label">
+                        {cite.doc_title} - {cite.source_locator}
+                        {cite.relevance && <span className="relevance"> — {cite.relevance}</span>}
+                      </span>
+                      {source && (
+                        <svg className="cite-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </button>
+                    {isExpanded && source && (
+                      <div className="cite-slide-panel">
+                        {source.image_url && !missingImages[source.image_url] && (
+                          <img
+                            src={source.image_url}
+                            alt={`${cite.doc_title} - Slide ${cite.slide_number}`}
+                            className="slide-image"
+                            onError={() => setMissingImages(prev => ({ ...prev, [source.image_url]: true }))}
+                          />
+                        )}
+                        <pre className="slide-text">{source.text}</pre>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Checkpoint */}
