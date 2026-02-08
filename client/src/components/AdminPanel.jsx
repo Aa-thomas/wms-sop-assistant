@@ -133,7 +133,8 @@ export default function AdminPanel({ authFetch, currentUserId }) {
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || 'Failed to create user');
+        const msg = err.error || (err.errors && err.errors.map(e => e.msg).join(', ')) || 'Failed to create user';
+        throw new Error(msg);
       }
 
       const created = await res.json();
@@ -203,7 +204,8 @@ export default function AdminPanel({ authFetch, currentUserId }) {
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || 'Failed to set password');
+        const msg = err.error || (err.errors && err.errors.map(e => e.msg).join(', ')) || 'Failed to set password';
+        throw new Error(msg);
       }
 
       setNewPassword('');
@@ -392,7 +394,8 @@ export default function AdminPanel({ authFetch, currentUserId }) {
                   value={newUser.password}
                   onChange={e => setNewUser(prev => ({ ...prev, password: e.target.value }))}
                   required
-                  minLength={6}
+                  minLength={8}
+                  placeholder="Min 8 chars, uppercase, lowercase, number"
                 />
               </div>
               <div className="form-group checkbox">
@@ -428,7 +431,8 @@ export default function AdminPanel({ authFetch, currentUserId }) {
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
                   required
-                  minLength={6}
+                  minLength={8}
+                  placeholder="Min 8 chars, uppercase, lowercase, number"
                   autoFocus
                 />
               </div>
