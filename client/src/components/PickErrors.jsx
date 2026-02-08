@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 import { useToast } from '../contexts/ToastContext';
 import './PickErrors.css';
 
@@ -126,6 +127,23 @@ export default function PickErrors({ authFetch }) {
     }
   };
 
+  const handleExport = () => {
+    const rows = errors.map(err => ({
+      Date: new Date(err.created_at).toLocaleDateString('en-US'),
+      User: err.user_id,
+      PPS: err.pps_number,
+      Shipment: err.shipment_number,
+      Item: err.item,
+      Variance: err.quantity_variance,
+      Notes: err.notes || ''
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Pick Errors');
+    const today = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `pick-errors-${today}.xlsx`);
+  };
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
@@ -149,6 +167,9 @@ export default function PickErrors({ authFetch }) {
         <div className="header-actions">
           <button className="log-error-btn" onClick={() => setShowLogModal(true)}>
             + Log Error
+          </button>
+          <button className="export-btn" onClick={handleExport} disabled={errors.length === 0}>
+            Export
           </button>
           <select
             className="user-filter-select"
