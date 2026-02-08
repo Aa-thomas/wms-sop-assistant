@@ -427,6 +427,73 @@
   cursor: not-allowed;
 }
 
+/* Admin Panel */
+.admin-panel {
+  margin-top: var(--space-4);
+}
+
+.admin-section {
+  margin-bottom: var(--space-8);
+}
+
+.admin-section-title {
+  margin: 0 0 var(--space-2) 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+
+.admin-section-desc {
+  margin: 0 0 var(--space-4) 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.module-access-table th:not(:first-child),
+.module-access-table td:not(:first-child) {
+  text-align: center;
+  width: 120px;
+}
+
+.module-toggle-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1px solid;
+  min-width: 80px;
+}
+
+.module-toggle-btn.enabled {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  border-color: var(--status-success);
+}
+
+.module-toggle-btn.enabled:hover:not(:disabled) {
+  background: var(--status-success);
+  color: white;
+}
+
+.module-toggle-btn.disabled {
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  border-color: var(--border-color);
+}
+
+.module-toggle-btn.disabled:hover:not(:disabled) {
+  background: var(--text-tertiary);
+  color: white;
+  border-color: var(--text-tertiary);
+}
+
+.module-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .supervisor-dashboard {

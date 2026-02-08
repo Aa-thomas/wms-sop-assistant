@@ -14,7 +14,8 @@ export default defineConfig({
       '/onboarding': 'http://localhost:3000',
       '/gaps': 'http://localhost:3000',
       '/pick-errors': 'http://localhost:3000',
-      '/users': 'http://localhost:3000'
+      '/users': 'http://localhost:3000',
+      '/modules': 'http://localhost:3000'
     }
   }
 })

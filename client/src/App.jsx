@@ -181,7 +181,7 @@ function App() {
       </header>
 
       <main>
-        <SearchBar onSubmit={handleSubmit} loading={loading} />
+        <SearchBar onSubmit={handleSubmit} loading={loading} authFetch={authedFetch} />
 
         {!response && !loading && (
           <div className="starter-prompts">

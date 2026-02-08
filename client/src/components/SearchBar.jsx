@@ -1,21 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const MODULES = [
-  { value: '', label: 'All Modules' },
-  { value: 'Navigation', label: 'Navigation' },
-  { value: 'Inbound', label: 'Inbound' },
-  { value: 'Outbound', label: 'Outbound' },
-  { value: 'Picking', label: 'Picking' },
-  { value: 'Replenishment', label: 'Replenishment' },
-  { value: 'Inventory', label: 'Inventory' },
-  { value: 'CycleCounts', label: 'Cycle Counts' },
-  { value: 'Returns', label: 'Returns' },
-  { value: 'Admin', label: 'Admin' }
-];
-
-export default function SearchBar({ onSubmit, loading }) {
+export default function SearchBar({ onSubmit, loading, authFetch }) {
   const [question, setQuestion] = useState('');
   const [module, setModule] = useState('');
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    if (authFetch) {
+      authFetch('/modules/available')
+        .then(res => res.json())
+        .then(data => setModules(data))
+        .catch(err => console.error('Failed to load modules:', err));
+    }
+  }, [authFetch]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -39,7 +36,8 @@ export default function SearchBar({ onSubmit, loading }) {
           onChange={e => setModule(e.target.value)}
           disabled={loading}
         >
-          {MODULES.map(m => (
+          <option value="">All Modules</option>
+          {modules.map(m => (
             <option key={m.value} value={m.value}>{m.label}</option>
           ))}
         </select>

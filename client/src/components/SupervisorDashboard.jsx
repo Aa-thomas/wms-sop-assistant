@@ -4,7 +4,7 @@ import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
 import GapAnalysis from './GapAnalysis';
 import TeamHealth from './TeamHealth';
 import PickErrors from './PickErrors';
-import UserManagement from './UserManagement';
+import AdminPanel from './AdminPanel';
 import './SupervisorDashboard.css';
 
 export default function SupervisorDashboard({ onExit, authFetch, currentUserId }) {
@@ -83,7 +83,7 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
           <button className="tab-btn">Team Onboarding</button>
           <button className="tab-btn">Knowledge Gaps</button>
           <button className="tab-btn">Pick Errors</button>
-          <button className="tab-btn">Users</button>
+          <button className="tab-btn">Admin</button>
         </div>
         <div className="summary-cards">
           <SkeletonSummaryCard />
@@ -151,10 +151,10 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
           Pick Errors
         </button>
         <button
-          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-          onClick={() => setActiveTab('users')}
+          className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
+          onClick={() => setActiveTab('admin')}
         >
-          Users
+          Admin
         </button>
       </div>
 
@@ -164,7 +164,7 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
 
       {activeTab === 'errors' && <PickErrors authFetch={authFetch} />}
 
-      {activeTab === 'users' && <UserManagement authFetch={authFetch} currentUserId={currentUserId} />}
+      {activeTab === 'admin' && <AdminPanel authFetch={authFetch} currentUserId={currentUserId} />}
 
       {activeTab === 'onboarding' && <>
       {/* Summary Cards */}

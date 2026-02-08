@@ -228,18 +228,33 @@ router.get('/progress/:user_id', async (req, res) => {
 
 /**
  * GET /onboarding/available
- * Get list of available onboarding modules
+ * Get list of available onboarding modules (filtered by user role)
  */
 router.get('/available', async (req, res) => {
+  const role = req.user.is_supervisor ? 'supervisor' : 'operator';
+
   try {
+    // Get enabled modules for this role
+    const enabledResult = await db.query(
+      'SELECT module FROM module_assignments WHERE role = $1 AND enabled = true',
+      [role]
+    );
+    const enabledModules = enabledResult.rows.map(r => r.module);
+
+    if (enabledModules.length === 0) {
+      return res.json([]);
+    }
+
     const result = await db.query(
       `SELECT
         module,
         COUNT(*) as total_steps,
         string_agg(step_title, ', ' ORDER BY step_number) as topics
        FROM onboarding_curriculum
+       WHERE module = ANY($1)
        GROUP BY module
-       ORDER BY module`
+       ORDER BY module`,
+      [enabledModules]
     );
 
     return res.json(result.rows);
