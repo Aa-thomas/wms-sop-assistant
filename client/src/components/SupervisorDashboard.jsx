@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
+import GapAnalysis from './GapAnalysis';
 import './SupervisorDashboard.css';
 
 export default function SupervisorDashboard({ onExit }) {
@@ -9,6 +10,7 @@ export default function SupervisorDashboard({ onExit }) {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [activeTab, setActiveTab] = useState('onboarding');
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -70,8 +72,12 @@ export default function SupervisorDashboard({ onExit }) {
     return (
       <div className="supervisor-dashboard">
         <div className="dashboard-header">
-          <h1>Team Onboarding Dashboard</h1>
+          <h1>Supervisor Dashboard</h1>
           <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
+        </div>
+        <div className="dashboard-tabs">
+          <button className="tab-btn active">Team Onboarding</button>
+          <button className="tab-btn" onClick={() => { setActiveTab('gaps'); }}>Knowledge Gaps</button>
         </div>
         <div className="summary-cards">
           <SkeletonSummaryCard />
@@ -109,10 +115,28 @@ export default function SupervisorDashboard({ onExit }) {
   return (
     <div className="supervisor-dashboard">
       <div className="dashboard-header">
-        <h1>Team Onboarding Dashboard</h1>
+        <h1>Supervisor Dashboard</h1>
         <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
       </div>
 
+      <div className="dashboard-tabs">
+        <button
+          className={`tab-btn ${activeTab === 'onboarding' ? 'active' : ''}`}
+          onClick={() => setActiveTab('onboarding')}
+        >
+          Team Onboarding
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'gaps' ? 'active' : ''}`}
+          onClick={() => setActiveTab('gaps')}
+        >
+          Knowledge Gaps
+        </button>
+      </div>
+
+      {activeTab === 'gaps' && <GapAnalysis />}
+
+      {activeTab === 'onboarding' && <>
       {/* Summary Cards */}
       <div className="summary-cards">
         {summary.map(s => (
@@ -225,6 +249,7 @@ export default function SupervisorDashboard({ onExit }) {
           No onboarding data {selectedModule ? `for ${selectedModule}` : ''} yet.
         </div>
       )}
+      </>}
 
       {/* User Details Modal */}
       {selectedUser && userDetails && (

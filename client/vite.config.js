@@ -10,7 +10,8 @@ export default defineConfig({
       '/feedback': 'http://localhost:3000',
       '/health': 'http://localhost:3000',
       '/images': 'http://localhost:3000',
-      '/onboarding': 'http://localhost:3000'
+      '/onboarding': 'http://localhost:3000',
+      '/gaps': 'http://localhost:3000'
     }
   }
 })

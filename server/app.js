@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const routes = require('./routes/ask');
 const onboardingRouter = require('./routes/onboarding');
+const gapsRouter = require('./routes/gaps');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/images', express.static(path.join(__dirname, '..', 'data', 'images')))
 // Routes
 app.use('/', routes);
 app.use('/onboarding', onboardingRouter);
+app.use('/gaps', gapsRouter);
 
 // In production, serve the React build and handle client-side routing
 if (process.env.NODE_ENV === 'production') {
