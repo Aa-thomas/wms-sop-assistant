@@ -1,0 +1,355 @@
+/* Floating Action Button */
+.feedback-fab {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all var(--transition-default);
+  z-index: 100;
+}
+
+.feedback-fab:hover {
+  transform: scale(1.05);
+  background: var(--accent-primary-hover);
+}
+
+.feedback-fab:active {
+  transform: scale(0.97);
+}
+
+/* Modal Overlay - matches SupervisorDashboard.css */
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Modal Content - matches SupervisorDashboard.css */
+.feedback-modal {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-8);
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  animation: modalScaleIn 0.2s ease;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.feedback-modal::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.feedback-modal h2 {
+  margin: 0 0 var(--space-2) 0;
+  padding-right: var(--space-8);
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.feedback-modal .subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-5);
+}
+
+/* Close Button - matches SupervisorDashboard.css */
+.feedback-modal .close-btn {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  line-height: 1;
+  transition: color var(--transition-default);
+}
+
+.feedback-modal .close-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Form Styles */
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.feedback-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.feedback-form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Type Selection Buttons */
+.feedback-form .type-buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.feedback-form .type-btn {
+  flex: 1;
+  padding: var(--space-3);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-default);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.feedback-form .type-btn .icon {
+  font-size: 1.25rem;
+}
+
+.feedback-form .type-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+  background: var(--bg-surface-hover);
+}
+
+.feedback-form .type-btn.selected {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+}
+
+.feedback-form .type-btn.selected.complaint {
+  border-color: var(--status-error);
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.feedback-form .type-btn.selected.suggestion {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+/* Form Inputs */
+.feedback-form select,
+.feedback-form textarea {
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition-default);
+}
+
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.feedback-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Urgency Buttons */
+.feedback-form .urgency-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.feedback-form .urgency-btn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.feedback-form .urgency-btn:hover {
+  border-color: var(--text-secondary);
+  background: var(--bg-surface-hover);
+}
+
+.feedback-form .urgency-btn.selected {
+  font-weight: 600;
+}
+
+.feedback-form .urgency-btn.selected.low {
+  border-color: var(--text-secondary);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+.feedback-form .urgency-btn.selected.normal {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+}
+
+.feedback-form .urgency-btn.selected.high {
+  border-color: var(--status-error);
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+/* Submit Button */
+.feedback-form .submit-btn {
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-default);
+  margin-top: var(--space-2);
+}
+
+.feedback-form .submit-btn:hover:not(:disabled) {
+  background: var(--accent-primary-hover);
+}
+
+.feedback-form .submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Anonymous Notice */
+.feedback-form .anon-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--status-success-bg);
+  border-radius: var(--radius-md);
+  color: var(--status-success);
+  font-size: 0.85rem;
+}
+
+.feedback-form .anon-notice .icon {
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feedback-modal {
+    width: 95%;
+    padding: var(--space-6);
+    max-height: 85vh;
+  }
+
+  .feedback-form .urgency-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedback-fab {
+    bottom: var(--space-4);
+    right: var(--space-4);
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .feedback-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-5);
+    margin-top: auto;
+  }
+
+  .feedback-modal-overlay {
+    align-items: flex-end;
+  }
+
+  .feedback-modal h2 {
+    font-size: 1.25rem;
+  }
+
+  .feedback-form .type-buttons {
+    flex-direction: column;
+  }
+
+  .feedback-form .type-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .feedback-form .urgency-row {
+    gap: var(--space-1);
+  }
+
+  .feedback-form .urgency-btn {
+    padding: var(--space-2);
+    font-size: 0.85rem;
+  }
+
+  .feedback-form textarea {
+    min-height: 100px;
+  }
+}

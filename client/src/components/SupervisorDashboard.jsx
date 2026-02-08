@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
+import DailyBriefing from './DailyBriefing';
 import GapAnalysis from './GapAnalysis';
 import TeamHealth from './TeamHealth';
 import PickErrors from './PickErrors';
+import FeedbackInbox from './FeedbackInbox';
 import AdminPanel from './AdminPanel';
 import './SupervisorDashboard.css';
 
@@ -13,7 +15,7 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
-  const [activeTab, setActiveTab] = useState('health');
+  const [activeTab, setActiveTab] = useState('briefing');
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -79,10 +81,12 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
           <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
         </div>
         <div className="dashboard-tabs">
-          <button className="tab-btn active">Team Health</button>
+          <button className="tab-btn active">Briefing</button>
+          <button className="tab-btn">Team Health</button>
           <button className="tab-btn">Team Onboarding</button>
           <button className="tab-btn">Knowledge Gaps</button>
           <button className="tab-btn">Pick Errors</button>
+          <button className="tab-btn">Feedback</button>
           <button className="tab-btn">Admin</button>
         </div>
         <div className="summary-cards">
@@ -127,6 +131,12 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
 
       <div className="dashboard-tabs">
         <button
+          className={`tab-btn ${activeTab === 'briefing' ? 'active' : ''}`}
+          onClick={() => setActiveTab('briefing')}
+        >
+          Briefing
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'health' ? 'active' : ''}`}
           onClick={() => setActiveTab('health')}
         >
@@ -151,6 +161,12 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
           Pick Errors
         </button>
         <button
+          className={`tab-btn ${activeTab === 'feedback' ? 'active' : ''}`}
+          onClick={() => setActiveTab('feedback')}
+        >
+          Feedback
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
           onClick={() => setActiveTab('admin')}
         >
@@ -158,11 +174,17 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
         </button>
       </div>
 
+      {activeTab === 'briefing' && (
+        <DailyBriefing authFetch={authFetch} onNavigateTab={setActiveTab} />
+      )}
+
       {activeTab === 'health' && <TeamHealth authFetch={authFetch} />}
 
       {activeTab === 'gaps' && <GapAnalysis authFetch={authFetch} />}
 
       {activeTab === 'errors' && <PickErrors authFetch={authFetch} />}
+
+      {activeTab === 'feedback' && <FeedbackInbox authFetch={authFetch} />}
 
       {activeTab === 'admin' && <AdminPanel authFetch={authFetch} currentUserId={currentUserId} />}
 

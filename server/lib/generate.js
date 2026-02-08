@@ -1,16 +1,16 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const OpenAI = require('openai');
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function generate(prompt) {
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }]
     });
 
-    let text = response.content[0].text.trim();
+    let text = response.choices[0].message.content.trim();
 
     // Strip markdown code fences if present
     if (text.startsWith('```')) {
@@ -31,7 +31,7 @@ async function generate(prompt) {
       };
     }
   } catch (error) {
-    console.error('Claude API error:', error.message);
+    console.error('OpenAI API error:', error.message);
     throw new Error('Failed to generate answer');
   }
 }

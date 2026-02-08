@@ -4,6 +4,7 @@ import Answer from './components/Answer';
 import OnboardingMode from './components/OnboardingMode';
 import SupervisorDashboard from './components/SupervisorDashboard';
 import LoginForm from './components/LoginForm';
+import AnonymousFeedbackForm from './components/AnonymousFeedbackForm';
 import { SkeletonAnswer } from './components/Skeleton';
 import { useToast } from './contexts/ToastContext';
 import './App.css';
@@ -34,6 +35,7 @@ function App() {
   const [mode, setMode] = useState('chat');
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const { showToast } = useToast();
 
   // Validate existing token on mount
@@ -207,6 +209,21 @@ function App() {
           onFeedback={handleFeedback}
         />
       </main>
+
+      {/* Anonymous Feedback FAB */}
+      <button
+        className="feedback-fab"
+        onClick={() => setShowFeedbackForm(true)}
+        title="Submit anonymous feedback"
+      >
+        💬
+      </button>
+
+      <AnonymousFeedbackForm
+        authFetch={authedFetch}
+        isOpen={showFeedbackForm}
+        onClose={() => setShowFeedbackForm(false)}
+      />
     </div>
   );
 }

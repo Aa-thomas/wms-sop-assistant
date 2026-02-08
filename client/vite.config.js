@@ -15,7 +15,8 @@ export default defineConfig({
       '/gaps': 'http://localhost:3000',
       '/pick-errors': 'http://localhost:3000',
       '/users': 'http://localhost:3000',
-      '/modules': 'http://localhost:3000'
+      '/modules': 'http://localhost:3000',
+      '/briefing': 'http://localhost:3000'
     }
   }
 })
