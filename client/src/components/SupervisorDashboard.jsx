@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
 import GapAnalysis from './GapAnalysis';
+import TeamHealth from './TeamHealth';
 import './SupervisorDashboard.css';
 
-export default function SupervisorDashboard({ onExit }) {
+export default function SupervisorDashboard({ onExit, authFetch }) {
   const [dashboard, setDashboard] = useState([]);
   const [summary, setSummary] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
-  const [activeTab, setActiveTab] = useState('onboarding');
+  const [activeTab, setActiveTab] = useState('health');
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
@@ -21,7 +22,7 @@ export default function SupervisorDashboard({ onExit }) {
 
   const loadDashboard = async () => {
     try {
-      const res = await fetch('/onboarding/supervisor/dashboard');
+      const res = await authFetch('/onboarding/supervisor/dashboard');
       const data = await res.json();
       setDashboard(data);
     } catch (error) {
@@ -37,7 +38,7 @@ export default function SupervisorDashboard({ onExit }) {
       const url = module
         ? `/onboarding/supervisor/summary?module=${encodeURIComponent(module)}`
         : '/onboarding/supervisor/summary';
-      const res = await fetch(url);
+      const res = await authFetch(url);
       const data = await res.json();
       setSummary(data);
     } catch (error) {
@@ -48,7 +49,7 @@ export default function SupervisorDashboard({ onExit }) {
 
   const loadUserDetails = async (userId) => {
     try {
-      const res = await fetch(`/onboarding/supervisor/user/${encodeURIComponent(userId)}`);
+      const res = await authFetch(`/onboarding/supervisor/user/${encodeURIComponent(userId)}`);
       const data = await res.json();
       setUserDetails(data);
       setSelectedUser(userId);
@@ -76,8 +77,9 @@ export default function SupervisorDashboard({ onExit }) {
           <button onClick={onExit} className="exit-btn">&times; Back to Chat</button>
         </div>
         <div className="dashboard-tabs">
-          <button className="tab-btn active">Team Onboarding</button>
-          <button className="tab-btn" onClick={() => { setActiveTab('gaps'); }}>Knowledge Gaps</button>
+          <button className="tab-btn active">Team Health</button>
+          <button className="tab-btn">Team Onboarding</button>
+          <button className="tab-btn">Knowledge Gaps</button>
         </div>
         <div className="summary-cards">
           <SkeletonSummaryCard />
@@ -121,6 +123,12 @@ export default function SupervisorDashboard({ onExit }) {
 
       <div className="dashboard-tabs">
         <button
+          className={`tab-btn ${activeTab === 'health' ? 'active' : ''}`}
+          onClick={() => setActiveTab('health')}
+        >
+          Team Health
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'onboarding' ? 'active' : ''}`}
           onClick={() => setActiveTab('onboarding')}
         >
@@ -134,7 +142,9 @@ export default function SupervisorDashboard({ onExit }) {
         </button>
       </div>
 
-      {activeTab === 'gaps' && <GapAnalysis />}
+      {activeTab === 'health' && <TeamHealth authFetch={authFetch} />}
+
+      {activeTab === 'gaps' && <GapAnalysis authFetch={authFetch} />}
 
       {activeTab === 'onboarding' && <>
       {/* Summary Cards */}

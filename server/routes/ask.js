@@ -47,8 +47,8 @@ router.post('/ask', async (req, res) => {
       const db = await getPool();
       const embSql = pgvector.toSql(queryEmbedding);
       const result = await db.query(
-        `INSERT INTO interactions (question, module, answer, chunk_ids, similarity_scores, question_embedding)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO interactions (question, module, answer, chunk_ids, similarity_scores, question_embedding, user_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING id`,
         [
           question,
@@ -56,7 +56,8 @@ router.post('/ask', async (req, res) => {
           JSON.stringify(response),
           chunks.map(c => c.id),
           chunks.map(c => c.similarity),
-          embSql
+          embSql,
+          req.user ? req.user.id.toString() : null
         ]
       );
       interactionId = result.rows[0].id;

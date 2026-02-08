@@ -4,16 +4,18 @@ const db = require('../lib/db');
 const { retrieve } = require('../lib/retrieval');
 const { buildOnboardingPrompt, buildQuizValidationPrompt } = require('../lib/prompt');
 const { generate } = require('../lib/generate');
+const { supervisorMiddleware } = require('../lib/auth');
 
 /**
  * POST /onboarding/start
  * Start onboarding for a module
  */
 router.post('/start', async (req, res) => {
-  const { user_id, module } = req.body;
+  const user_id = req.user.id.toString();
+  const { module } = req.body;
 
-  if (!user_id || !module) {
-    return res.status(400).json({ error: 'user_id and module required' });
+  if (!module) {
+    return res.status(400).json({ error: 'module required' });
   }
 
   try {
@@ -79,7 +81,8 @@ router.post('/start', async (req, res) => {
  * Get explanation for current step
  */
 router.post('/step', async (req, res) => {
-  const { user_id, module } = req.body;
+  const user_id = req.user.id.toString();
+  const { module } = req.body;
 
   try {
     const stepResult = await db.query(
@@ -130,7 +133,8 @@ router.post('/step', async (req, res) => {
  * Mark current step as complete and move to next
  */
 router.post('/complete-step', async (req, res) => {
-  const { user_id, module, step_number } = req.body;
+  const user_id = req.user.id.toString();
+  const { module, step_number } = req.body;
 
   try {
     const result = await db.query(
@@ -251,10 +255,11 @@ router.get('/available', async (req, res) => {
  * Validate user's answer to checkpoint question using Claude
  */
 router.post('/validate-answer', async (req, res) => {
-  const { user_id, module, step_number, user_answer } = req.body;
+  const user_id = req.user.id.toString();
+  const { module, step_number, user_answer } = req.body;
 
-  if (!user_id || !module || !step_number || !user_answer) {
-    return res.status(400).json({ error: 'user_id, module, step_number, and user_answer required' });
+  if (!module || !step_number || !user_answer) {
+    return res.status(400).json({ error: 'module, step_number, and user_answer required' });
   }
 
   try {
@@ -329,7 +334,7 @@ router.post('/validate-answer', async (req, res) => {
  * GET /onboarding/supervisor/dashboard
  * Get complete team onboarding status
  */
-router.get('/supervisor/dashboard', async (req, res) => {
+router.get('/supervisor/dashboard', supervisorMiddleware, async (req, res) => {
   try {
     const result = await db.query(
       'SELECT * FROM supervisor_onboarding_dashboard'
@@ -346,7 +351,7 @@ router.get('/supervisor/dashboard', async (req, res) => {
  * GET /onboarding/supervisor/summary
  * Get aggregated statistics by module
  */
-router.get('/supervisor/summary', async (req, res) => {
+router.get('/supervisor/summary', supervisorMiddleware, async (req, res) => {
   const { module } = req.query;
 
   try {
@@ -366,7 +371,7 @@ router.get('/supervisor/summary', async (req, res) => {
  * GET /onboarding/supervisor/user/:user_id
  * Get detailed progress for a specific user
  */
-router.get('/supervisor/user/:user_id', async (req, res) => {
+router.get('/supervisor/user/:user_id', supervisorMiddleware, async (req, res) => {
   const { user_id } = req.params;
 
   try {
@@ -392,6 +397,53 @@ router.get('/supervisor/user/:user_id', async (req, res) => {
   } catch (error) {
     console.error('Error getting user details:', error);
     return res.status(500).json({ error: 'Failed to load user details' });
+  }
+});
+
+/**
+ * GET /onboarding/supervisor/team-health
+ * Get per-user learning health summary
+ */
+router.get('/supervisor/team-health', supervisorMiddleware, async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM user_learning_health');
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Error getting team health:', error);
+    return res.status(500).json({ error: 'Failed to load team health' });
+  }
+});
+
+/**
+ * GET /onboarding/supervisor/user/:user_id/weaknesses
+ * Get knowledge weaknesses for a specific user
+ */
+router.get('/supervisor/user/:user_id/weaknesses', supervisorMiddleware, async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const result = await db.query(
+      'SELECT * FROM user_knowledge_weaknesses WHERE user_id = $1',
+      [user_id]
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Error getting user weaknesses:', error);
+    return res.status(500).json({ error: 'Failed to load user weaknesses' });
+  }
+});
+
+/**
+ * GET /onboarding/supervisor/team-strength
+ * Get team-level strength overview
+ */
+router.get('/supervisor/team-strength', supervisorMiddleware, async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM get_team_strength_overview()');
+    return res.json(result.rows[0] || {});
+  } catch (error) {
+    console.error('Error getting team strength:', error);
+    return res.status(500).json({ error: 'Failed to load team strength' });
   }
 });
 

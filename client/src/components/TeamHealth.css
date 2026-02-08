@@ -1,0 +1,227 @@
+/* Team Strength Banner */
+.team-strength-banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.strength-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.strength-card .strength-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.strength-card .strength-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.strength-card.healthy .strength-number {
+  color: var(--status-success);
+}
+
+.strength-card.attention .strength-number {
+  color: var(--status-warning);
+}
+
+.strength-card.at-risk .strength-number {
+  color: var(--status-error);
+}
+
+.strength-card.total .strength-number {
+  color: var(--accent-primary);
+}
+
+.weakest-modules {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-6);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.weakest-modules strong {
+  color: var(--text-primary);
+}
+
+.weakest-modules .weak-module-tag {
+  display: inline-block;
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: var(--space-2);
+}
+
+/* Health Table */
+.health-table {
+  width: 100%;
+  background: var(--bg-surface);
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.health-table th {
+  background: var(--bg-subtle);
+  padding: var(--space-4);
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.health-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.health-table tbody tr:hover {
+  background: var(--bg-subtle);
+}
+
+.health-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.health-indicator.healthy {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.health-indicator.needs_attention {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.health-indicator.at_risk {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.health-indicator .health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Detail Modal - Weaknesses */
+.weakness-section {
+  margin-top: var(--space-6);
+}
+
+.weakness-section h3 {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.weakness-item {
+  background: var(--bg-subtle);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  border-left: 3px solid var(--border-default);
+}
+
+.weakness-item.quiz_failure {
+  border-left-color: var(--status-error);
+}
+
+.weakness-item.stalled_module {
+  border-left-color: var(--status-warning);
+}
+
+.weakness-item.not_started {
+  border-left-color: var(--text-tertiary);
+}
+
+.weakness-type-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: var(--space-2);
+}
+
+.weakness-item.quiz_failure .weakness-type-badge {
+  color: var(--status-error);
+}
+
+.weakness-item.stalled_module .weakness-type-badge {
+  color: var(--status-warning);
+}
+
+.weakness-item.not_started .weakness-type-badge {
+  color: var(--text-tertiary);
+}
+
+.weakness-item .weakness-detail {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: var(--space-1) 0;
+}
+
+.weakness-item .weakness-meta {
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  margin-top: var(--space-2);
+}
+
+.no-weaknesses {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Loading state for detail modal */
+.detail-loading {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .team-strength-banner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .health-table {
+    font-size: 0.85rem;
+  }
+
+  .health-table th,
+  .health-table td {
+    padding: var(--space-2);
+  }
+}
