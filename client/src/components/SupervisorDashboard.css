@@ -20,6 +20,7 @@
 }
 
 .dashboard-header .exit-btn {
+  position: static;
   background: none;
   border: 1px solid var(--border-default);
   font-size: 0.9rem;
@@ -436,8 +437,15 @@
   margin-bottom: var(--space-8);
 }
 
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
 .admin-section-title {
-  margin: 0 0 var(--space-2) 0;
+  margin: 0;
   font-family: var(--font-serif);
   font-weight: 400;
   font-size: 1.25rem;
@@ -492,6 +500,208 @@
 .module-toggle-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* User Management Actions */
+.add-user-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.add-user-btn:hover {
+  background: var(--accent-primary-dark);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-start;
+}
+
+.action-btn {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  transition: all 0.2s;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--bg-subtle);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-btn.delete:hover:not(:disabled) {
+  background: var(--status-error-bg);
+  border-color: var(--status-error);
+}
+
+.action-btn.disable:hover:not(:disabled) {
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning);
+}
+
+.action-btn.enable:hover:not(:disabled) {
+  background: var(--status-success-bg);
+  border-color: var(--status-success);
+}
+
+.status-badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.status-badge.inactive {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.disabled-user {
+  opacity: 0.6;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.form-group.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.form-group.checkbox input {
+  width: auto;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+}
+
+.form-actions button {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.form-actions button[type="button"] {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.form-actions button[type="button"]:hover {
+  background: var(--bg-primary);
+}
+
+.form-actions button[type="submit"] {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+}
+
+.form-actions button[type="submit"]:hover:not(:disabled) {
+  background: var(--accent-primary-dark);
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Confirmation Modal */
+.confirm-modal {
+  max-width: 400px;
+}
+
+.confirm-message {
+  margin: var(--space-4) 0 var(--space-6) 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.confirm-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+}
+
+.confirm-btn:hover {
+  background: var(--accent-primary-dark);
+}
+
+.confirm-btn.delete {
+  background: var(--status-error);
+}
+
+.confirm-btn.delete:hover {
+  background: #c0392b;
+}
+
+.confirm-btn.disable {
+  background: var(--status-warning);
+}
+
+.confirm-btn.disable:hover {
+  background: #d68910;
+}
+
+.confirm-btn.demote {
+  background: var(--status-warning);
+}
+
+.confirm-btn.demote:hover {
+  background: #d68910;
 }
 
 /* Mobile Responsive */

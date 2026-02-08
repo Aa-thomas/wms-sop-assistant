@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await db.query(
-      'SELECT id, username, password_hash, is_supervisor FROM users WHERE username = $1',
+      'SELECT id, username, password_hash, is_supervisor, is_active FROM users WHERE username = $1',
       [username]
     );
 
@@ -25,6 +25,12 @@ router.post('/login', async (req, res) => {
     }
 
     const user = result.rows[0];
+
+    // Check if user is disabled
+    if (user.is_active === false) {
+      return res.status(403).json({ error: 'Account is disabled. Contact your supervisor.' });
+    }
+
     const valid = await comparePassword(password, user.password_hash);
 
     if (!valid) {
