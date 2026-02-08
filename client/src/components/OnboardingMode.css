@@ -57,11 +57,27 @@
   padding: var(--space-6);
   transition: all 0.2s;
   box-shadow: var(--shadow-sm);
+  animation: contentIn 0.3s ease both;
 }
+
+.module-card:nth-child(1) { animation-delay: 0ms; }
+.module-card:nth-child(2) { animation-delay: 50ms; }
+.module-card:nth-child(3) { animation-delay: 100ms; }
+.module-card:nth-child(4) { animation-delay: 150ms; }
+.module-card:nth-child(5) { animation-delay: 200ms; }
+.module-card:nth-child(6) { animation-delay: 250ms; }
+.module-card:nth-child(7) { animation-delay: 300ms; }
+.module-card:nth-child(8) { animation-delay: 350ms; }
+.module-card:nth-child(9) { animation-delay: 400ms; }
 
 .module-card:hover {
   border-color: var(--accent-primary);
   box-shadow: var(--shadow-md);
+}
+
+.module-card:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .module-card h3 {
@@ -118,7 +134,17 @@
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-8);
   box-shadow: var(--shadow-sm);
-  position: relative;
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.progress-header-row .exit-btn {
+  position: static;
 }
 
 .progress-bar {
@@ -127,11 +153,11 @@
   background: var(--bg-subtle);
   border-radius: var(--radius-full);
   overflow: hidden;
-  margin-top: var(--space-2);
 }
 
 .module-title {
   font-weight: 600;
+  font-size: 1.05rem;
   color: var(--text-primary);
 }
 
@@ -144,6 +170,7 @@
   color: var(--text-primary);
   z-index: 2;
   font-size: 0.9rem;
+  text-shadow: 0 0 4px var(--bg-surface), 0 0 8px var(--bg-surface);
 }
 
 .progress-fill {
@@ -155,12 +182,29 @@
   transition: width 0.5s ease;
 }
 
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
 /* Step Content */
 .step-content {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   padding: var(--space-8);
   box-shadow: var(--shadow-md);
+  animation: contentIn 0.3s ease;
 }
 
 .step-content h2 {
@@ -349,6 +393,18 @@
   padding: var(--space-6);
   border-radius: var(--radius-lg);
   margin-top: var(--space-6);
+  animation: quizSlideIn 0.3s ease;
+}
+
+@keyframes quizSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .quiz-feedback.correct {
@@ -404,23 +460,26 @@
 }
 
 .retry-btn:hover {
-  background: #9A6422;
+  background: var(--status-warning-hover);
 }
 
 /* Completion Screen */
 .onboarding-completion {
   text-align: center;
-  padding: var(--space-8) var(--space-6);
-  background: var(--bg-surface);
+  padding: var(--space-12) var(--space-8);
+  background: var(--status-success-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   margin-top: var(--space-8);
+  border: 1px solid var(--status-success);
+  animation: contentIn 0.4s ease;
 }
 
 .completion-icon {
   font-size: 3rem;
   color: var(--status-success);
   margin-bottom: var(--space-4);
+  animation: scaleIn 0.5s ease;
 }
 
 .onboarding-completion h2 {
@@ -453,5 +512,10 @@
 
   .onboarding-header h2 {
     font-size: 1.5rem;
+  }
+
+  .onboarding-header .exit-btn {
+    position: static;
+    margin-bottom: var(--space-4);
   }
 }

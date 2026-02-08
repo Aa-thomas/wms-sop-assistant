@@ -19,6 +19,22 @@
   color: var(--text-primary);
 }
 
+.dashboard-header .exit-btn {
+  background: none;
+  border: 1px solid var(--border-default);
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-default);
+}
+
+.dashboard-header .exit-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -39,6 +55,11 @@
 .summary-card:hover {
   border-color: var(--accent-primary);
   box-shadow: var(--shadow-md);
+}
+
+.summary-card:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .summary-card.selected {
@@ -108,12 +129,17 @@
   cursor: pointer;
 }
 
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
 .progress-table {
   width: 100%;
   background: var(--bg-surface);
-  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
   border-collapse: collapse;
 }
 
@@ -161,6 +187,7 @@
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
+  text-shadow: 0 0 4px var(--bg-surface), 0 0 8px var(--bg-surface);
 }
 
 .status-badge {
@@ -222,7 +249,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(41, 38, 27, 0.4);
+  background: var(--overlay-bg);
+  animation: fadeIn 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,6 +267,23 @@
   overflow-y: auto;
   position: relative;
   box-shadow: var(--shadow-lg);
+  animation: modalScaleIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal-content h2 {

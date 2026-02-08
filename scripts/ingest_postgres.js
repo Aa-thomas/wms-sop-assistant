@@ -12,6 +12,10 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 async function ingestFile(jsonPath) {
   const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  if (!data.slides || !Array.isArray(data.slides)) {
+    console.log(`Skipping: ${path.basename(jsonPath)} (not a slide document)`);
+    return 0;
+  }
   console.log(`Ingesting: ${data.doc_title} (${data.slides.length} slides)`);
 
   // Build chunks from slides
