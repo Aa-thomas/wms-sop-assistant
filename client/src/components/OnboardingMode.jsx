@@ -11,6 +11,7 @@ export default function OnboardingMode({ userId, onExit }) {
   const [userAnswer, setUserAnswer] = useState('');
   const [quizResult, setQuizResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState(null);
 
   // Load available modules on mount
   useEffect(() => {
@@ -33,18 +34,17 @@ export default function OnboardingMode({ userId, onExit }) {
       const data = await res.json();
 
       if (data.status === 'already_completed') {
-        alert(data.message);
+        setCompletionMessage(data.message);
+        setLoading(false);
         return;
       }
 
       setSelectedModule(module);
       setStep(data.step);
-      loadStepContent(module);
+      await loadStepContent(module);
 
     } catch (error) {
       console.error('Failed to start onboarding:', error);
-      alert('Failed to start onboarding. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -114,19 +114,34 @@ export default function OnboardingMode({ userId, onExit }) {
       const data = await res.json();
 
       if (data.completed) {
-        alert(data.message);
-        onExit();
+        setCompletionMessage(data.message);
+        setLoading(false);
       } else {
         setStep(data.next_step);
-        loadStepContent(selectedModule);
+        await loadStepContent(selectedModule);
       }
 
     } catch (error) {
       console.error('Failed to complete step:', error);
-    } finally {
       setLoading(false);
     }
   };
+
+  // Render completion message (replaces alert())
+  if (completionMessage) {
+    return (
+      <div className="onboarding-step-view">
+        <div className="onboarding-completion">
+          <div className="completion-icon">&#10003;</div>
+          <h2>Module Complete!</h2>
+          <p>{completionMessage}</p>
+          <button onClick={onExit} className="continue-btn">
+            Back to Chat
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Render module selection
   if (!selectedModule) {
@@ -234,13 +249,20 @@ export default function OnboardingMode({ userId, onExit }) {
                 <p className="feedback-text">{quizResult.feedback}</p>
 
                 {quizResult.can_proceed ? (
-                  <button
-                    onClick={completeStep}
-                    className="continue-btn"
-                    disabled={loading}
-                  >
-                    Continue to Next Step
-                  </button>
+                  <>
+                    {!quizResult.is_correct && (
+                      <p className="retry-hint">
+                        Attempts: {quizResult.attempts}/{quizResult.max_attempts}
+                      </p>
+                    )}
+                    <button
+                      onClick={completeStep}
+                      className="continue-btn"
+                      disabled={loading}
+                    >
+                      Continue to Next Step
+                    </button>
+                  </>
                 ) : (
                   <>
                     <p className="retry-hint">

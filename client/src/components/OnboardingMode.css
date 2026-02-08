@@ -407,6 +407,36 @@
   background: #9A6422;
 }
 
+/* Completion Screen */
+.onboarding-completion {
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-top: var(--space-8);
+}
+
+.completion-icon {
+  font-size: 3rem;
+  color: var(--status-success);
+  margin-bottom: var(--space-4);
+}
+
+.onboarding-completion h2 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin: 0 0 var(--space-4) 0;
+  color: var(--text-primary);
+}
+
+.onboarding-completion p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: var(--space-6);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .onboarding-module-selector {
