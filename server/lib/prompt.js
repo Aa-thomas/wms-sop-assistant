@@ -138,4 +138,45 @@ IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanat
 NOW: Grade the user's answer above.`;
 }
 
-module.exports = { buildPrompt, buildOnboardingPrompt, buildQuizValidationPrompt };
+function buildPickErrorAnalysisPrompt(username, errors, stats) {
+  const errorList = errors.map(e =>
+    `- ${new Date(e.created_at).toLocaleDateString()}: Item ${e.item} at ${e.pps_number} (Shipment ${e.shipment_number}), variance: ${e.quantity_variance > 0 ? '+' : ''}${e.quantity_variance}${e.notes ? ` — "${e.notes}"` : ''}`
+  ).join('\n');
+
+  return `You are a warehouse operations coach analyzing picking errors for operator "${username}".
+
+ERROR HISTORY (last 90 days):
+${errorList}
+
+AGGREGATED STATS:
+- Total errors: ${stats.total_errors}
+- Average variance: ${stats.avg_variance}
+- Most common items: ${stats.top_items.join(', ') || 'N/A'}
+- Most common PPS locations: ${stats.top_pps.join(', ') || 'N/A'}
+- Date range: ${stats.date_range}
+
+TASK:
+Analyze this operator's error patterns and generate targeted coaching tips. Consider:
+1. Are errors concentrated on specific items or locations?
+2. Is the variance consistently short-picks or over-picks?
+3. Is the frequency increasing or decreasing over time?
+4. What specific, actionable steps can this operator take to improve?
+
+OUTPUT FORMAT (JSON):
+{
+  "tips": [
+    {
+      "title": "Short actionable title",
+      "description": "Detailed coaching guidance (2-3 sentences)",
+      "priority": "high" | "medium" | "low"
+    }
+  ],
+  "summary": "One paragraph overall assessment of this operator's error patterns and trajectory"
+}
+
+Return 2-5 tips, ordered by priority (high first). Be specific and constructive — reference actual items, locations, and patterns from the data.
+
+IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanation.`;
+}
+
+module.exports = { buildPrompt, buildOnboardingPrompt, buildQuizValidationPrompt, buildPickErrorAnalysisPrompt };

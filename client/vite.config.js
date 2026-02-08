@@ -6,12 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
+      '/auth': 'http://localhost:3000',
       '/ask': 'http://localhost:3000',
       '/feedback': 'http://localhost:3000',
       '/health': 'http://localhost:3000',
       '/images': 'http://localhost:3000',
       '/onboarding': 'http://localhost:3000',
-      '/gaps': 'http://localhost:3000'
+      '/gaps': 'http://localhost:3000',
+      '/pick-errors': 'http://localhost:3000'
     }
   }
 })

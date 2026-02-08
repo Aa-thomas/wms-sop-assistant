@@ -1,0 +1,391 @@
+/* Pick Errors Header */
+.pick-errors-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.pick-errors-header .header-actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.log-error-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.log-error-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.user-filter-select {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Summary Cards */
+.error-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.error-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.error-stat-card .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-1);
+  color: var(--accent-primary);
+}
+
+.error-stat-card .stat-number.negative {
+  color: var(--status-error);
+}
+
+.error-stat-card .stat-number.positive {
+  color: var(--status-warning);
+}
+
+.error-stat-card .stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.error-stat-card .stat-detail {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
+}
+
+/* AI Coaching Section */
+.coaching-section {
+  margin-bottom: var(--space-6);
+}
+
+.coaching-section h3 {
+  margin: 0 0 var(--space-4) 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.analyze-btn {
+  background: none;
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coaching-summary {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.coaching-tip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--border-default);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.coaching-tip.high {
+  border-left-color: var(--status-error);
+}
+
+.coaching-tip.medium {
+  border-left-color: var(--status-warning);
+}
+
+.coaching-tip.low {
+  border-left-color: var(--status-success);
+}
+
+.coaching-tip .tip-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.coaching-tip .tip-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.coaching-tip .tip-priority {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.coaching-tip.high .tip-priority {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.coaching-tip.medium .tip-priority {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.coaching-tip.low .tip-priority {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.coaching-tip .tip-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.analyzing-indicator {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Error Log Table */
+.error-log-table {
+  width: 100%;
+  background: var(--bg-surface);
+  overflow: hidden;
+  border-collapse: collapse;
+}
+
+.error-log-table th {
+  background: var(--bg-subtle);
+  padding: var(--space-4);
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.error-log-table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+}
+
+.error-log-table tbody tr:hover {
+  background: var(--bg-subtle);
+}
+
+.variance-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.variance-badge.short {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.variance-badge.over {
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
+}
+
+.error-notes {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+/* Log Error Modal */
+.log-error-modal .modal-content {
+  max-width: 500px;
+}
+
+.log-error-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.log-error-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.log-error-form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.log-error-form input,
+.log-error-form select,
+.log-error-form textarea {
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.log-error-form input:focus,
+.log-error-form select:focus,
+.log-error-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.log-error-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.modal-actions .cancel-btn {
+  background: none;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.modal-actions .cancel-btn:hover {
+  border-color: var(--text-secondary);
+}
+
+.modal-actions .save-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-default);
+}
+
+.modal-actions .save-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.modal-actions .save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.no-errors {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pick-errors-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pick-errors-header .header-actions {
+    justify-content: stretch;
+  }
+
+  .error-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .error-log-table {
+    font-size: 0.85rem;
+  }
+
+  .error-log-table th,
+  .error-log-table td {
+    padding: var(--space-2);
+  }
+
+  .error-notes {
+    max-width: 100px;
+  }
+}

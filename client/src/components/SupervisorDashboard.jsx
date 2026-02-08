@@ -3,6 +3,7 @@ import { useToast } from '../contexts/ToastContext';
 import { SkeletonSummaryCard, SkeletonTableRow } from './Skeleton';
 import GapAnalysis from './GapAnalysis';
 import TeamHealth from './TeamHealth';
+import PickErrors from './PickErrors';
 import './SupervisorDashboard.css';
 
 export default function SupervisorDashboard({ onExit, authFetch }) {
@@ -80,6 +81,7 @@ export default function SupervisorDashboard({ onExit, authFetch }) {
           <button className="tab-btn active">Team Health</button>
           <button className="tab-btn">Team Onboarding</button>
           <button className="tab-btn">Knowledge Gaps</button>
+          <button className="tab-btn">Pick Errors</button>
         </div>
         <div className="summary-cards">
           <SkeletonSummaryCard />
@@ -140,11 +142,19 @@ export default function SupervisorDashboard({ onExit, authFetch }) {
         >
           Knowledge Gaps
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'errors' ? 'active' : ''}`}
+          onClick={() => setActiveTab('errors')}
+        >
+          Pick Errors
+        </button>
       </div>
 
       {activeTab === 'health' && <TeamHealth authFetch={authFetch} />}
 
       {activeTab === 'gaps' && <GapAnalysis authFetch={authFetch} />}
+
+      {activeTab === 'errors' && <PickErrors authFetch={authFetch} />}
 
       {activeTab === 'onboarding' && <>
       {/* Summary Cards */}
