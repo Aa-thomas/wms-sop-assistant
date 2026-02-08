@@ -61,23 +61,31 @@ function buildOnboardingPrompt(step, chunks) {
     `[${c.source_locator}]\n${c.text}`
   ).join('\n\n---\n\n');
 
+  const availableDocTitles = [...new Set(chunks.map(c => c.doc_title))];
+
   return `You are a friendly warehouse training assistant helping a new operator learn the ${step.module} module.
 
 CONTEXT:
 You are teaching: "${step.step_title}"
 Description: ${step.step_description}
 
+CRITICAL GROUNDING RULES:
+1. Use ONLY the provided SOP context below — do NOT add external knowledge or "best practices" not in the chunks
+2. Every claim or instruction must come from the SOP text and cite the specific slide
+3. Do NOT invent or rephrase doc_titles — use ONLY these exact titles: ${availableDocTitles.map(t => `"${t}"`).join(', ')}
+4. Extract the ACTUAL numbered steps/procedures from the SOP text — do NOT summarize as "follow these general steps" or "follow the standard process"
+5. If the SOP chunks contain specific field names, screen names, button labels, or menu paths, include them verbatim
+
 TONE & STYLE:
 - Be encouraging and supportive (this is their first week!)
 - Use clear, simple language (avoid jargon unless explaining it)
 - Break down complex procedures into numbered steps
 - Include practical tips and common mistakes to avoid
-- Reference the SOP citations for official procedures
 
 TEACHING APPROACH:
 1. Start with a brief overview (2-3 sentences)
-2. Explain the step-by-step procedure with citations
-3. Include a "Quick Tip" or "Common Mistake" if relevant
+2. Extract and present the actual step-by-step procedure from the SOP chunks with citations
+3. Include a "Quick Tip" or "Common Mistake" if relevant (must come from SOP content)
 4. End with a checkpoint question to verify understanding
 
 SOP CONTEXT:
@@ -85,12 +93,12 @@ ${context}
 
 OUTPUT FORMAT (JSON):
 {
-  "explanation": "The full teaching content with citations inline like (Picking SOP - Slide 12)",
-  "quick_tip": "One practical tip to help them succeed",
-  "common_mistake": "One common error to watch out for (optional)",
+  "explanation": "The full teaching content with citations inline like (${availableDocTitles[0] || 'Doc Title'} - Slide 10). Extract actual procedures from the SOP text.",
+  "quick_tip": "One practical tip from the SOP content to help them succeed",
+  "common_mistake": "One common error mentioned in or implied by the SOP (optional)",
   "citations": [
     {
-      "doc_title": "SOP title",
+      "doc_title": "exact doc_title from the chunks above",
       "source_locator": "Slide X",
       "slide_number": X,
       "relevance": "why this citation matters for this step"
@@ -98,7 +106,9 @@ OUTPUT FORMAT (JSON):
   ]
 }
 
-NOW: Create the explanation for "${step.step_title}". Make it clear, encouraging, and actionable!`;
+IMPORTANT: Return ONLY the JSON object. No markdown, no code fences, no explanation.
+
+NOW: Create the explanation for "${step.step_title}". Extract real procedures from the SOP chunks — be specific and actionable!`;
 }
 
 function buildQuizValidationPrompt(question, userAnswer, chunks) {
