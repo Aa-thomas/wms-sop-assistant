@@ -183,6 +183,28 @@ router.patch('/:id/password',
   }
 });
 
+// Reset welcome tour for a user
+router.patch('/:id/welcome-reset', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const db = await getPool();
+    const result = await db.query(
+      'UPDATE users SET has_seen_welcome = FALSE WHERE id = $1 RETURNING id, username',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true, message: `Welcome tour reset for ${result.rows[0].username}` });
+  } catch (error) {
+    console.error('[USERS] Welcome reset failed:', error.message);
+    res.status(500).json({ error: 'Failed to reset welcome tour' });
+  }
+});
+
 // Delete user
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;

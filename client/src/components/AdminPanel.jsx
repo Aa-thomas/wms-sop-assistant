@@ -217,6 +217,27 @@ export default function AdminPanel({ authFetch, currentUserId }) {
     }
   };
 
+  const resetWelcomeTour = async (user) => {
+    setUpdatingUser(user.id);
+    try {
+      const res = await authFetch(`/users/${user.id}/welcome-reset`, {
+        method: 'PATCH',
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to reset welcome tour');
+      }
+
+      showToast('success', `Welcome tour will show on ${user.username}'s next login.`);
+    } catch (error) {
+      console.error('Failed to reset welcome tour:', error);
+      showToast('error', error.message);
+    } finally {
+      setUpdatingUser(null);
+    }
+  };
+
   const deleteUser = async (user, confirmed = false) => {
     if (!confirmed) {
       setConfirmModal({
@@ -318,6 +339,14 @@ export default function AdminPanel({ authFetch, currentUserId }) {
                           title={isSelf ? 'Cannot disable yourself' : (user.is_active !== false ? 'Disable User' : 'Enable User')}
                         >
                           {user.is_active !== false ? '🚫' : '✓'}
+                        </button>
+                        <button
+                          className="action-btn tour"
+                          onClick={() => resetWelcomeTour(user)}
+                          disabled={updatingUser === user.id}
+                          title="Reset welcome tour — user will see it on next login"
+                        >
+                          🎓
                         </button>
                         <button
                           className="action-btn delete"

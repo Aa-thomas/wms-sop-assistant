@@ -17,7 +17,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await db.query(
-      'SELECT id, username, password_hash, is_supervisor, is_active FROM users WHERE username = $1',
+      'SELECT id, username, password_hash, is_supervisor, is_active, has_seen_welcome FROM users WHERE username = $1',
       [username]
     );
 
@@ -68,7 +68,8 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        is_supervisor: user.is_supervisor
+        is_supervisor: user.is_supervisor,
+        has_seen_welcome: user.has_seen_welcome
       }
     });
   } catch (error) {
@@ -82,11 +83,45 @@ router.post('/login', async (req, res) => {
  * Validate token and return current user info
  */
 router.get('/me', authMiddleware, async (req, res) => {
-  res.json({
-    id: req.user.id,
-    username: req.user.username,
-    is_supervisor: req.user.is_supervisor
-  });
+  try {
+    const result = await db.query(
+      'SELECT has_seen_welcome FROM users WHERE id = $1',
+      [req.user.id]
+    );
+    const hasSeenWelcome = result.rows[0]?.has_seen_welcome ?? true;
+
+    res.json({
+      id: req.user.id,
+      username: req.user.username,
+      is_supervisor: req.user.is_supervisor,
+      has_seen_welcome: hasSeenWelcome
+    });
+  } catch (error) {
+    console.error('[AUTH] /me error:', error);
+    res.json({
+      id: req.user.id,
+      username: req.user.username,
+      is_supervisor: req.user.is_supervisor,
+      has_seen_welcome: true
+    });
+  }
+});
+
+/**
+ * POST /auth/welcome-complete
+ * Mark the welcome tour as seen for the authenticated user
+ */
+router.post('/welcome-complete', authMiddleware, async (req, res) => {
+  try {
+    await db.query(
+      'UPDATE users SET has_seen_welcome = TRUE WHERE id = $1',
+      [req.user.id]
+    );
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('[AUTH] Welcome complete error:', error);
+    res.status(500).json({ error: 'Failed to update welcome status' });
+  }
 });
 
 module.exports = router;
