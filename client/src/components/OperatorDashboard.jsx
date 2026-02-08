@@ -3,9 +3,11 @@ import PersonalBriefing from './PersonalBriefing';
 import PersonalHealth from './PersonalHealth';
 import PersonalTraining from './PersonalTraining';
 import PersonalErrors from './PersonalErrors';
+import PageTooltips from './PageTooltips';
+import { OPERATOR_TOOLTIPS } from '../lib/tourConfig';
 import './OperatorDashboard.css';
 
-export default function OperatorDashboard({ onExit, onStartOnboarding, authFetch, currentUser }) {
+export default function OperatorDashboard({ onExit, onStartOnboarding, authFetch, currentUser, tourActive, onTourEnd, onPageComplete }) {
   const [activeTab, setActiveTab] = useState('briefing');
 
   return (
@@ -49,6 +51,10 @@ export default function OperatorDashboard({ onExit, onStartOnboarding, authFetch
       {activeTab === 'health' && <PersonalHealth authFetch={authFetch} />}
       {activeTab === 'training' && <PersonalTraining authFetch={authFetch} onStartOnboarding={onStartOnboarding} />}
       {activeTab === 'errors' && <PersonalErrors authFetch={authFetch} />}
+
+      {tourActive && (
+        <PageTooltips tooltips={OPERATOR_TOOLTIPS} onSkipTour={onTourEnd} onPageComplete={onPageComplete} />
+      )}
     </div>
   );
 }

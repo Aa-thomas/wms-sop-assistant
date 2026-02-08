@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { SkeletonStep, SkeletonModuleCard } from './Skeleton';
+import PageTooltips from './PageTooltips';
+import { ONBOARDING_TOOLTIPS } from '../lib/tourConfig';
 import './OnboardingMode.css';
 
-export default function OnboardingMode({ userId, onExit, authFetch }) {
+export default function OnboardingMode({ userId, onExit, authFetch, tourActive, onTourEnd, onPageComplete }) {
   const [step, setStep] = useState(null);
   const [modules, setModules] = useState([]);
   const [modulesLoading, setModulesLoading] = useState(true);
@@ -185,6 +187,10 @@ export default function OnboardingMode({ userId, onExit, authFetch }) {
             ))
           )}
         </div>
+
+        {tourActive && (
+          <PageTooltips tooltips={ONBOARDING_TOOLTIPS} onSkipTour={onTourEnd} onPageComplete={onPageComplete} />
+        )}
       </div>
     );
   }

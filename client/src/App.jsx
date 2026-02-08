@@ -6,6 +6,9 @@ import SupervisorDashboard from './components/SupervisorDashboard';
 import OperatorDashboard from './components/OperatorDashboard';
 import LoginForm from './components/LoginForm';
 import AnonymousFeedbackForm from './components/AnonymousFeedbackForm';
+import WelcomeTour from './components/WelcomeTour';
+import PageTooltips from './components/PageTooltips';
+import { CHAT_TOOLTIPS } from './lib/tourConfig';
 import { SkeletonAnswer } from './components/Skeleton';
 import { useToast } from './contexts/ToastContext';
 import './App.css';
@@ -37,6 +40,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [tourActive, setTourActive] = useState(false);
+  const [tourCompletedPages, setTourCompletedPages] = useState(new Set());
   const { showToast } = useToast();
 
   // Validate existing token on mount
@@ -136,6 +141,25 @@ function App() {
     return <LoginForm onLogin={handleLogin} />;
   }
 
+  function handleWelcomeComplete() {
+    setTourActive(true);
+  }
+
+  async function handleTourEnd() {
+    setTourActive(false);
+    setTourCompletedPages(new Set());
+    setCurrentUser(prev => ({ ...prev, has_seen_welcome: true }));
+    try {
+      await authedFetch('/auth/welcome-complete', { method: 'POST' });
+    } catch {
+      // Non-critical
+    }
+  }
+
+  function handlePageComplete(pageKey) {
+    setTourCompletedPages(prev => new Set(prev).add(pageKey));
+  }
+
   if (mode === 'onboarding') {
     return (
       <div className="app">
@@ -143,6 +167,9 @@ function App() {
           userId={currentUser.id.toString()}
           onExit={() => setMode('chat')}
           authFetch={authedFetch}
+          tourActive={tourActive && !tourCompletedPages.has('onboarding')}
+          onTourEnd={handleTourEnd}
+          onPageComplete={() => handlePageComplete('onboarding')}
         />
       </div>
     );
@@ -151,7 +178,7 @@ function App() {
   if (mode === 'supervisor') {
     return (
       <div className="app" style={{ maxWidth: '1400px' }}>
-        <SupervisorDashboard onExit={() => setMode('chat')} authFetch={authedFetch} currentUserId={currentUser.id} />
+        <SupervisorDashboard onExit={() => setMode('chat')} authFetch={authedFetch} currentUserId={currentUser.id} tourActive={tourActive && !tourCompletedPages.has('supervisor')} onTourEnd={handleTourEnd} onPageComplete={() => handlePageComplete('supervisor')} />
       </div>
     );
   }
@@ -164,6 +191,9 @@ function App() {
           onStartOnboarding={() => setMode('onboarding')}
           authFetch={authedFetch}
           currentUser={currentUser}
+          tourActive={tourActive && !tourCompletedPages.has('operator')}
+          onTourEnd={handleTourEnd}
+          onPageComplete={() => handlePageComplete('operator')}
         />
       </div>
     );
@@ -244,6 +274,14 @@ function App() {
         isOpen={showFeedbackForm}
         onClose={() => setShowFeedbackForm(false)}
       />
+
+      {tourActive && !tourCompletedPages.has('chat') && (
+        <PageTooltips tooltips={CHAT_TOOLTIPS} onSkipTour={handleTourEnd} onPageComplete={() => handlePageComplete('chat')} />
+      )}
+
+      {currentUser && !currentUser.has_seen_welcome && !tourActive && (
+        <WelcomeTour onComplete={handleWelcomeComplete} />
+      )}
     </div>
   );
 }

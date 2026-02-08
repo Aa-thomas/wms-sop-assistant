@@ -7,9 +7,11 @@ import TeamHealth from './TeamHealth';
 import PickErrors from './PickErrors';
 import FeedbackInbox from './FeedbackInbox';
 import AdminPanel from './AdminPanel';
+import PageTooltips from './PageTooltips';
+import { SUPERVISOR_TOOLTIPS } from '../lib/tourConfig';
 import './SupervisorDashboard.css';
 
-export default function SupervisorDashboard({ onExit, authFetch, currentUserId }) {
+export default function SupervisorDashboard({ onExit, authFetch, currentUserId, tourActive, onTourEnd, onPageComplete }) {
   const [dashboard, setDashboard] = useState([]);
   const [summary, setSummary] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
@@ -302,6 +304,10 @@ export default function SupervisorDashboard({ onExit, authFetch, currentUserId }
         </div>
       )}
       </>}
+
+      {tourActive && (
+        <PageTooltips tooltips={SUPERVISOR_TOOLTIPS} onSkipTour={onTourEnd} onPageComplete={onPageComplete} />
+      )}
 
       {/* User Details Modal */}
       {selectedUser && userDetails && (

@@ -1,0 +1,153 @@
+/* ========================
+   Spotlight Overlay
+   ======================== */
+.page-tooltips-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.tooltip-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ========================
+   Tooltip Card
+   ======================== */
+.page-tooltip {
+  position: fixed;
+  max-width: 280px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-default);
+  padding: 0;
+  pointer-events: auto;
+  animation: tooltip-enter 0.2s ease;
+  z-index: 9999;
+}
+
+@keyframes tooltip-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-tooltip-body {
+  padding: var(--space-4) var(--space-4) var(--space-2);
+}
+
+.page-tooltip-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.page-tooltip-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ========================
+   Footer
+   ======================== */
+.page-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-top: 1px solid var(--border-default);
+  gap: var(--space-2);
+}
+
+.page-tooltip-skip {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.page-tooltip-skip:hover {
+  color: var(--text-primary);
+}
+
+.page-tooltip-counter {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.page-tooltip-next {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: none;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.page-tooltip-next:hover {
+  background: var(--accent-primary-hover);
+}
+
+/* ========================
+   Arrow
+   ======================== */
+.page-tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.page-tooltip-arrow--bottom {
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bg-surface);
+}
+
+.page-tooltip-arrow--top {
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--bg-surface);
+}
+
+.page-tooltip-arrow--right {
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--bg-surface);
+}
+
+.page-tooltip-arrow--left {
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--bg-surface);
+}
+
+/* ========================
+   Responsive
+   ======================== */
+@media (max-width: 520px) {
+  .page-tooltip {
+    max-width: calc(100vw - 32px);
+  }
+}
