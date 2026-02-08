@@ -10,14 +10,22 @@ export const CHAT_TOOLTIPS = [
 ];
 
 export const OPERATOR_TOOLTIPS = [
-  { selector: '.operator-dashboard-tabs', title: 'Dashboard Tabs', description: 'Switch between your daily briefing, health metrics, training modules, and pick errors.' },
+  { selector: '.operator-dashboard-tabs .tab-btn:nth-child(1)', title: 'Daily Briefing', description: 'Your daily briefing with key metrics, alerts, and quick actions to start your shift.' },
   { selector: '.metrics-cards', title: 'Your Metrics', description: 'Quick snapshot of your health, progress, and recent errors. Click any card for details.' },
   { selector: '.quick-actions', title: 'Quick Actions', description: 'Jump directly to training, health details, or error review.' },
+  { selector: '.operator-dashboard-tabs .tab-btn:nth-child(2)', title: 'My Health', description: 'Track your personal health metrics and wellness history over time.' },
+  { selector: '.operator-dashboard-tabs .tab-btn:nth-child(3)', title: 'Modules', description: 'Access your SOP training modules and track your learning progress.' },
+  { selector: '.operator-dashboard-tabs .tab-btn:nth-child(4)', title: 'Pick Errors', description: 'Review your recent pick errors and learn from mistakes to improve accuracy.' },
 ];
 
 export const SUPERVISOR_TOOLTIPS = [
-  { selector: '.dashboard-tabs', title: 'Management Tabs', description: 'Access team briefings, health tracking, onboarding progress, knowledge gaps, and admin tools.' },
-  { selector: '.summary-cards', title: 'Team Overview', description: 'Click any metric card to jump to its detailed view.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(1)', title: 'Daily Briefing', description: 'Daily team briefing with alerts, action items, and shift updates.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(2)', title: 'Team Health', description: 'Monitor team wellness trends and individual health metrics.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(3)', title: 'Team Onboarding', description: 'Track team training progress across all SOP modules.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(4)', title: 'Knowledge Gaps', description: 'Identify common knowledge gaps from questions and anonymous feedback.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(5)', title: 'Pick Errors', description: 'Review team-wide pick error trends and patterns.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(6)', title: 'Feedback', description: 'Read anonymous feedback submitted by operators.' },
+  { selector: '.dashboard-tabs .tab-btn:nth-child(7)', title: 'Admin', description: 'Manage users, roles, and system settings.' },
 ];
 
 export const ONBOARDING_TOOLTIPS = [
