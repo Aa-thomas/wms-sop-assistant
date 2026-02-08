@@ -95,7 +95,7 @@ router.post('/step', async (req, res) => {
 
     const allChunks = [];
     for (const query of step.search_queries) {
-      const chunks = await retrieve(query, module);
+      const { chunks } = await retrieve(query, module);
       allChunks.push(...chunks);
     }
 
@@ -274,7 +274,7 @@ router.post('/validate-answer', async (req, res) => {
     // Retrieve relevant chunks for context
     const allChunks = [];
     for (const query of step.search_queries) {
-      const chunks = await retrieve(query, module);
+      const { chunks } = await retrieve(query, module);
       allChunks.push(...chunks);
     }
 

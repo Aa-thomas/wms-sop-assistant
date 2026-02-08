@@ -34,10 +34,12 @@ const mockRetrieve = vi.fn().mockResolvedValue([
 // Resolve absolute paths to the modules we want to mock
 const generatePath = require.resolve('../../server/lib/generate');
 const retrievalPath = require.resolve('../../server/lib/retrieval');
+const goldenPath = require.resolve('../../server/lib/golden');
 
 // Clear any previously cached versions
 delete require.cache[generatePath];
 delete require.cache[retrievalPath];
+delete require.cache[goldenPath];
 
 // Inject mocks into require.cache
 require.cache[generatePath] = {
@@ -51,13 +53,22 @@ require.cache[retrievalPath] = {
   id: retrievalPath,
   filename: retrievalPath,
   loaded: true,
-  exports: { retrieve: mockRetrieve },
+  exports: { retrieve: mockRetrieve, getPool: vi.fn() },
+};
+
+require.cache[goldenPath] = {
+  id: goldenPath,
+  filename: goldenPath,
+  loaded: true,
+  exports: { findGoldenAnswer: vi.fn().mockResolvedValue(null) },
 };
 
 // Now clear any cached app/routes so they pick up our mocks
 const appPath = require.resolve('../../server/app');
+const askRoutePath = require.resolve('../../server/routes/ask');
 const onboardingRoutePath = require.resolve('../../server/routes/onboarding');
 delete require.cache[appPath];
+delete require.cache[askRoutePath];
 delete require.cache[onboardingRoutePath];
 
 // Load app — it will require generate/retrieval from cache and get our mocks
@@ -79,17 +90,20 @@ beforeEach(() => {
   mockGenerate.mockReset();
   mockRetrieve.mockClear();
   // Re-apply default retrieve mock
-  mockRetrieve.mockResolvedValue([
-    {
-      id: 'Test_SOP_slide_1',
-      text: 'Step 1: Log in to the WMS portal. Step 2: Navigate to the main menu.',
-      doc_title: 'Test SOP',
-      source_locator: 'Test SOP - Slide 1',
-      slide_number: 1,
-      module: 'Navigation',
-      similarity: 0.85,
-    },
-  ]);
+  mockRetrieve.mockResolvedValue({
+    chunks: [
+      {
+        id: 'Test_SOP_slide_1',
+        text: 'Step 1: Log in to the WMS portal. Step 2: Navigate to the main menu.',
+        doc_title: 'Test SOP',
+        source_locator: 'Test SOP - Slide 1',
+        slide_number: 1,
+        module: 'Navigation',
+        similarity: 0.85,
+      },
+    ],
+    queryEmbedding: new Array(1536).fill(0),
+  });
 });
 
 describe('GET /onboarding/available', () => {

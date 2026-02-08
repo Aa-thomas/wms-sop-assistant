@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Citations from './Citations';
 import { useToast } from '../contexts/ToastContext';
 
-export default function Answer({ data, question, onFeedback }) {
+export default function Answer({ data, interactionId, onFeedback }) {
   const [expanded, setExpanded] = useState({});
 
   if (!data) return null;
@@ -32,7 +32,7 @@ export default function Answer({ data, question, onFeedback }) {
             <strong>Suggestion:</strong> {follow_up_question}
           </div>
         )}
-        <FeedbackButtons question={question} onFeedback={onFeedback} />
+        <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function Answer({ data, question, onFeedback }) {
       )}
 
       <Citations citations={collectUniqueCitations(answer)} sources={sources || []} />
-      <FeedbackButtons question={question} onFeedback={onFeedback} />
+      <FeedbackButtons interactionId={interactionId} onFeedback={onFeedback} />
     </div>
   );
 }
@@ -118,13 +118,29 @@ function collectUniqueCitations(answer) {
   return citations;
 }
 
-function FeedbackButtons({ question, onFeedback }) {
+function FeedbackButtons({ interactionId, onFeedback }) {
   const [selected, setSelected] = useState(null);
+  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [comment, setComment] = useState('');
   const { showToast } = useToast();
 
-  const handleClick = (helpful) => {
-    setSelected(helpful);
-    onFeedback(question, helpful);
+  if (!interactionId) return null;
+
+  const handleThumbsUp = () => {
+    setSelected(true);
+    setShowCommentInput(false);
+    onFeedback(interactionId, true);
+    showToast('success', 'Thanks for your feedback!', 2000);
+  };
+
+  const handleThumbsDown = () => {
+    setSelected(false);
+    setShowCommentInput(true);
+  };
+
+  const handleCommentSubmit = () => {
+    onFeedback(interactionId, false, comment);
+    setShowCommentInput(false);
     showToast('success', 'Thanks for your feedback!', 2000);
   };
 
@@ -132,19 +148,33 @@ function FeedbackButtons({ question, onFeedback }) {
     <div className="feedback-buttons">
       <span>Was this helpful?</span>
       <button
-        onClick={() => handleClick(true)}
+        onClick={handleThumbsUp}
         className={selected === true ? 'selected' : ''}
+        disabled={selected !== null}
         title="Helpful"
       >
         &#128077;
       </button>
       <button
-        onClick={() => handleClick(false)}
+        onClick={handleThumbsDown}
         className={selected === false ? 'selected' : ''}
+        disabled={selected !== null}
         title="Not helpful"
       >
         &#128078;
       </button>
+      {showCommentInput && (
+        <div className="feedback-comment">
+          <input
+            type="text"
+            placeholder="What was wrong? (optional)"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleCommentSubmit()}
+          />
+          <button onClick={handleCommentSubmit}>Submit</button>
+        </div>
+      )}
     </div>
   );
 }

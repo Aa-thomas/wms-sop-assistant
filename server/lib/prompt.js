@@ -1,11 +1,19 @@
-function buildPrompt(question, chunks) {
+function buildPrompt(question, chunks, goldenExample = null) {
   const context = chunks.map(c =>
     `[${c.source_locator}]\n${c.text}`
   ).join('\n\n---\n\n');
 
-  return `You are a WMS (Warehouse Management System) SOP assistant for warehouse operators.
+  const goldenSection = goldenExample ? `
+REFERENCE EXAMPLE (verified good answer to a similar past question):
+Previous question: "${goldenExample.question}"
+Verified answer: ${JSON.stringify(goldenExample.answer)}
 
-CRITICAL RULES:
+Use this as a style and quality reference. Your answer MUST still be grounded ONLY in the context chunks below.
+
+` : '';
+
+  return `You are a WMS (Warehouse Management System) SOP assistant for warehouse operators.
+${goldenSection}CRITICAL RULES:
 1. Use ONLY the provided context chunks from SOPs
 2. If the answer is not in the context:
    - Respond with: "Not found in SOPs"

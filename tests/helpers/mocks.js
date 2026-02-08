@@ -72,10 +72,46 @@ function makeProgressRow(overrides = {}) {
   };
 }
 
+/** Create a fake golden answer */
+function makeGoldenAnswer(overrides = {}) {
+  return {
+    question: 'How do I log in to the WMS?',
+    answer: {
+      answer: [{ claim: 'Navigate to the WMS portal and enter your credentials.', citations: [{ doc_title: 'Test SOP', source_locator: 'Slide 1', slide_number: 1 }] }],
+      follow_up_question: null,
+      coverage: { chunks_used: 1 },
+    },
+    module: 'Navigation',
+    similarity: 0.95,
+    ...overrides,
+  };
+}
+
+/** Create a fake interaction row */
+function makeInteraction(overrides = {}) {
+  return {
+    id: 1,
+    question: 'How do I log in?',
+    module: 'Navigation',
+    answer: JSON.stringify({
+      answer: [{ claim: 'Log in at the portal.', citations: [] }],
+      follow_up_question: null,
+    }),
+    chunk_ids: ['Test_SOP_slide_1'],
+    similarity_scores: [0.85],
+    question_embedding: JSON.stringify(new Array(1536).fill(0)),
+    helpful: null,
+    comment: null,
+    ...overrides,
+  };
+}
+
 module.exports = {
   makeChunk,
   makeStep,
   makeOnboardingResponse,
   makeQuizValidationResponse,
   makeProgressRow,
+  makeGoldenAnswer,
+  makeInteraction,
 };

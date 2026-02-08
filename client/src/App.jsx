@@ -51,15 +51,15 @@ function App() {
     }
   }
 
-  async function handleFeedback(question, helpful) {
+  async function handleFeedback(interactionId, helpful, comment) {
     try {
       await fetch('/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question,
-          response_id: `${Date.now()}`,
-          helpful
+          interaction_id: interactionId,
+          helpful,
+          comment: comment || null
         })
       });
     } catch {
@@ -111,7 +111,7 @@ function App() {
 
         <Answer
           data={response}
-          question={lastQuestion}
+          interactionId={response?.interaction_id}
           onFeedback={handleFeedback}
         />
       </main>

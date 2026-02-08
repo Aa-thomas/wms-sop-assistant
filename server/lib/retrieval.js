@@ -29,7 +29,7 @@ async function retrieve(question, moduleFilter = null) {
     [embSql, moduleFilter]
   );
 
-  return result.rows;
+  return { chunks: result.rows, queryEmbedding: embedding };
 }
 
-module.exports = { retrieve };
+module.exports = { retrieve, getPool };
