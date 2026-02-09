@@ -1,0 +1,10 @@
+node_modules/
+client/node_modules/
+.env
+.git/
+*.png
+audit/
+data/
+.claude/
+*.log
+prd_*

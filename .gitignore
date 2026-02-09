@@ -5,3 +5,11 @@ data/source/
 dist/
 *.log
 prd_*
+
+# Screenshots (dev reference images)
+*.png
+
+# Scratch/working files
+audit/
+onboarding-audit.md
+steps.json
