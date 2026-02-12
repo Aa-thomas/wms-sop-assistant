@@ -81,7 +81,8 @@ app.use('/operator', authMiddleware, operatorRouter);
 // In production, serve the React build and handle client-side routing
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
-  app.get('*', (req, res) => {
+  // Fallback to index.html for client-side routing (Express 5 compatible)
+  app.use((req, res) => {
     res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
   });
 }

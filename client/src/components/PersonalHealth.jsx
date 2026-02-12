@@ -27,7 +27,7 @@ export default function PersonalHealth({ authFetch, onStartOnboarding }) {
         onboardingRes.json()
       ]);
       setHealth(healthData);
-      setWeaknesses(weaknessData);
+      setWeaknesses(Array.isArray(weaknessData) ? weaknessData : []);
       setOnboardingProgress(Array.isArray(onboardingData) ? onboardingData : []);
     } catch (error) {
       console.error('Failed to load health data:', error);

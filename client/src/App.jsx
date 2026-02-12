@@ -141,8 +141,14 @@ function App() {
     return <LoginForm onLogin={handleLogin} />;
   }
 
-  function handleWelcomeComplete() {
-    setTourActive(true);
+  async function handleWelcomeComplete() {
+    // Mark welcome tour as seen
+    setCurrentUser(prev => ({ ...prev, has_seen_welcome: true }));
+    try {
+      await authedFetch('/auth/welcome-complete', { method: 'POST' });
+    } catch {
+      // Non-critical - continue even if API fails
+    }
   }
 
   async function handleTourEnd() {
