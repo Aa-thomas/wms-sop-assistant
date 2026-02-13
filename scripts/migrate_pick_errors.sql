@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS pick_errors (
   item TEXT NOT NULL,
   quantity_variance INT NOT NULL,
   notes TEXT,
+  picked_from_location TEXT,
   recorded_by TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
